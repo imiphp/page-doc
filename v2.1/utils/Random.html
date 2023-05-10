@@ -190,15 +190,23 @@
 echo Random::int(), PHP_EOL;
 
 // 随机范围：1-20
-echo Random::int(1, 20), PHP_EOL;</code></pre><h3 id="number"><a href="#number">number</a></h3><p>随机生成小数</p><pre><code class="php">// 随机范围：PHP_INT_MIN-PHP_INT_MAX
+echo Random::int(1, 20), PHP_EOL;</code></pre><h3 id="float"><a href="#float">float</a></h3><p>随机小数</p><pre><code class="php">// 随机范围：PHP_INT_MIN-PHP_INT_MAX
+echo Random::float(), PHP_EOL;
+
+// 随机范围：1.1-20.5
+echo Random::float(1.1, 20.5), PHP_EOL;</code></pre><h3 id="number"><a href="#number">number</a></h3><p>随机生成小数文本</p><pre><code class="php">// 随机范围：PHP_INT_MIN-PHP_INT_MAX
 echo Random::number(), PHP_EOL;
 
 // 随机范围：12-20
-echo Random::number(1.2, 20), PHP_EOL;</code></pre><h3 id="text"><a href="#text">text</a></h3><p>随机生成文本</p><pre><code class="php">// 从abcdefg中随机4-6个字符
-echo Random::text(&#039;abcdefg&#039;, 4, 6), PHP_EOL;
+echo Random::number(1.2, 20), PHP_EOL;</code></pre><h3 id="text"><a href="#text">text</a></h3><p>随机生成文本</p><pre><code class="php">// 从啊哦额中随机4-6个字符
+echo Random::text(&#039;啊哦额&#039;, 4, 6), PHP_EOL;
 
-// 从abcdefg中随机5个字符
-echo Random::text(&#039;abcdefg&#039;, 5), PHP_EOL;</code></pre><h3 id="letter"><a href="#letter">letter</a></h3><p>随机生成字母</p><pre><code class="php">// 随机大小写字母4-6个
+// 从啊哦额中随机5个字符
+echo Random::text(&#039;啊哦额&#039;, 5), PHP_EOL;</code></pre><h3 id="bytes"><a href="#bytes">bytes</a></h3><p>随机生成字节集</p><pre><code class="php">// 从abcdefg中随机4-6个字节
+echo Random::bytes(&#039;abcdefg&#039;, 4, 6), PHP_EOL;
+
+// 从abcdefg中随机5个字节
+echo Random::bytes(&#039;abcdefg&#039;, 5), PHP_EOL;</code></pre><h3 id="letter"><a href="#letter">letter</a></h3><p>随机生成字母</p><pre><code class="php">// 随机大小写字母4-6个
 echo Random::letter(4, 6), PHP_EOL;
 // 随机大小写字母5个
 echo Random::letter(5), PHP_EOL;</code></pre><h3 id="digital"><a href="#digital">digital</a></h3><p>随机生成数字</p><p>和<code>Random::int()</code>方法不同的是，这个是生成字符串，所以不限制数值的大小。</p><pre><code class="php">// 随机100-200个数字
