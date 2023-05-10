@@ -1,0 +1,911 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>数据库操作 - imi 框架 v2.1 开发手册文档</title>
+    <!-- jQuery-->
+    <script src="../../statics/plugin/jquery/jquery-1.12.0.min.js"></script>
+    <!-- layui -->
+    <link rel="stylesheet" href="../../statics/plugin/layui/css/layui.css" />
+    <script src="../../statics/plugin/layui/layui.all.js"></script>
+    <!-- zTree -->
+    <link rel="stylesheet" href="../../statics/plugin/zTree/css/zTreeStyle/zTreeStyle.css" />
+    <script src="../../statics/plugin/zTree/js/jquery.ztree.core.js"></script>
+    <!-- SyntaxHighlighter -->
+    <script src="../../statics/plugin/SyntaxHighlighter/shCore.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="../../statics/plugin/SyntaxHighlighter/shCoreDefault.css"/>
+    <!-- 自定义 -->
+    <link rel="stylesheet" href="../../statics/css/style.css" />
+    <script src="../../statics/js/home.js"></script>
+    <link rel="stylesheet" href="../../statics/css/docView.css" />
+    <script src="../../statics/js/docView.js"></script>
+</head>
+<body>
+    <!-- top-begin -->
+    <div id="navbar">
+        <div class="bg-blur"></div>
+        <div class="navbar-body">
+            <ul class="layui-nav" lay-filter="">
+                <div class="navRight">
+                    <li class="layui-nav-item layui-this" lay-unselect>
+                        <a href="/v2.1/" target="_blank" style="padding-right: 40px;">v2.1 <span class="layui-badge">新</span></a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="/v2.0/" target="_blank">v2.0</a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="/v1/" target="_blank">v1.x</a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a id="btn-about" href="javascript:;">关于</a>
+                    </li>
+                </div>
+            </ul>
+            <div class="nav-menu">
+                <a href="../../" class="logo"><img src="../../statics/images/logo.png"/></a>
+                <a href="javascript:;" id="navMenuLeft"><i class="layui-icon layui-icon-spread-left"></i></a>
+                <a href="javascript:;" id="navMenuRight"><i class="layui-icon">&#xe61a;</i></a>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <script>
+    function showMask()
+    {
+        $('#mask').show();
+    }
+    function hideMask()
+    {
+        $('#mask').hide();
+    }
+    function clickMask()
+    {
+        closeMenuLeft();
+        closeMenuRight();
+    }
+    function openMenuLeft()
+    {
+        $('#leftbar').addClass('show-item');
+        $('#navMenuLeft').addClass('active');
+        var ico = $('#navMenuLeft .layui-icon');
+        ico.removeClass('layui-icon-spread-left');
+        ico.addClass('layui-icon-shrink-right');
+        showMask();
+    }
+    function closeMenuLeft()
+    {
+        $('#leftbar').removeClass('show-item');
+        $('#navMenuLeft').removeClass('active');
+        var ico = $('#navMenuLeft .layui-icon');
+        ico.removeClass('layui-icon-shrink-right');
+        ico.addClass('layui-icon-spread-left');
+        hideMask();
+    }
+    $('#navMenuLeft').click(function(){
+        var isShow = $('#leftbar').hasClass('show-item');
+        if(isShow)
+        {
+            closeMenuLeft();
+        }
+        else
+        {
+            closeMenuRight();
+            openMenuLeft();
+        }
+    });
+    function openMenuRight()
+    {
+        $('#navbar > .navbar-body > .layui-nav').addClass('show-item')
+        $('#navMenuRight').addClass('active').find('i').html('&#xe619;');
+        showMask();
+    }
+    function closeMenuRight()
+    {
+        $('#navbar > .navbar-body > .layui-nav').removeClass('show-item')
+        $('#navMenuRight').removeClass('active').find('i').html('&#xe61a;');
+        hideMask();
+    }
+    $('#navMenuRight').click(function(){
+        var isShow = $('#navbar > .navbar-body > .layui-nav').hasClass('show-item');
+        if(isShow)
+        {
+            closeMenuRight();
+        }
+        else
+        {
+            closeMenuLeft();
+            openMenuRight();
+        }
+    });
+    </script>
+    <!-- top-end -->
+
+    <!-- left-begin -->
+    <div id="leftbar" class="layui-nav-side">
+        <div class="layui-tab layui-tab-brief" style="margin-top:0">
+            <ul class="layui-tab-title">
+                <li class="layui-this"><i class="layui-icon">&#xe705;</i> 目录</li>
+                <li><i class="layui-icon">&#xe615;</i> 搜索</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <ul id="treeDirectory" class="ztree showIcon"></ul>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="searchBox">
+                        <div id="searchForm">
+                            <div class="inputBox">
+                                <input type="text" id="search-keyword" autocomplete="off" name="keyword" placeholder="搜索关键词" class="layui-input"/>
+                                <i class="layui-icon input-icon">&#xe615;</i>
+                            </div>
+                        </div>
+                        <ul id="treeSearch">
+                        </ul>
+                        <div class="searchResultNone">
+                            <i class="layui-icon">&#xe615;</i>
+                            <p>未搜索到结果</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright noScroll">imiphp</div>
+        </div>
+    </div>
+    <script id="searchListTemplate" type="text/html">
+        {{#  layui.each(d, function(index, item){ }}
+        <li>
+            <a href="{{ item.url }}">
+                <h3>{{ item.searchedTitle }}</h3>
+                <p>{{ item.searchedContent }}</p>
+            </a>
+        </li>
+        {{#  }) }}
+    </script>
+    <!-- left-end -->
+
+    <div id="body">
+        <div id="content_body" name="content_body" style="width:100%;height:100%;border:none;overflow: auto;">
+            <div id="article-content" class="markdown-body">
+                <script>
+                    document.title = '数据库操作 - imi 框架 v2.1 开发手册文档';
+                    var currentCatalog = {"id":133,"title":"数据库操作","pageTitle":"数据库操作","url":"components/db/index.html"};
+                    var rootPath = location.pathname.substr(0, location.pathname.indexOf(currentCatalog.url));
+                    if('' === rootPath)
+                    {
+                        rootPath = location.pathname;
+                    }
+                    var catalogList = [{"id":1,"parent_id":0,"title":"序言","level":0},{"id":2,"parent_id":1,"title":"项目介绍","pageTitle":"项目介绍","mdFileName":"README.md","url":"index.html","level":1},{"id":3,"parent_id":1,"title":"开发者社区","pageTitle":"开发者社区","mdFileName":"base/community.md","url":"base/community.html","level":1},{"id":4,"parent_id":1,"title":"技术支持","pageTitle":"技术支持","mdFileName":"base/support.md","url":"base/support.html","level":1},{"id":5,"parent_id":1,"title":"赞助开发","pageTitle":"赞助开发","mdFileName":"base/donate.md","url":"base/donate.html","level":1},{"id":6,"parent_id":1,"title":"版本支持计划","pageTitle":"版本支持计划","mdFileName":"base/version/support.md","url":"base/version/support.html","level":1},{"id":7,"parent_id":1,"title":"参与框架开发","pageTitle":"参与框架开发","mdFileName":"adv/devp.md","url":"adv/devp.html","level":1},{"id":8,"parent_id":0,"title":"基础入门","level":0},{"id":9,"parent_id":8,"title":"开始一个新项目","pageTitle":"开始一个新项目","mdFileName":"base/new.md","url":"base/new.html","level":1},{"id":10,"parent_id":8,"title":"应用配置","pageTitle":"应用配置","mdFileName":"base/config.md","url":"base/config.html","level":1},{"id":11,"parent_id":8,"title":"常见问题","pageTitle":"常见问题","mdFileName":"base/qa.md","url":"base/qa.html","level":1},{"id":12,"parent_id":8,"title":"v2.0-v2.1 升级指南","pageTitle":"v2.0-v2.1 升级指南","mdFileName":"base/version/2.0-2.1.md","url":"base/version/2.0-2.1.html","level":1},{"id":13,"parent_id":0,"title":"框架核心","level":0},{"id":14,"parent_id":13,"title":"生命周期","pageTitle":"生命周期","mdFileName":"core/lifeCycle.md","url":"core/lifeCycle.html","level":1},{"id":15,"parent_id":13,"title":"容器","pageTitle":"容器","mdFileName":"core/container.md","url":"core/container.html","level":1},{"id":16,"parent_id":13,"title":"请求上下文","pageTitle":"请求上下文","mdFileName":"core/requestContext.md","url":"core/requestContext.html","level":1},{"id":17,"parent_id":13,"title":"Partial","pageTitle":"Partial","mdFileName":"core/partial.md","url":"core/partial.html","level":1},{"id":18,"parent_id":13,"title":"事件","pageTitle":"事件监听","mdFileName":"components/event/index.md","url":"components/event/index.html","level":1},{"id":19,"parent_id":18,"title":"事件监听","pageTitle":"事件监听","mdFileName":"components/event/index.md","url":"components/event/index.html","level":2},{"id":20,"parent_id":18,"title":"事件列表","pageTitle":"事件列表","mdFileName":"core/events.md","url":"core/events.html","level":2},{"id":21,"parent_id":13,"title":"中间件","pageTitle":"中间件","mdFileName":"core/middleware.md","url":"core/middleware.html","level":1},{"id":22,"parent_id":13,"title":"错误转为异常捕获","pageTitle":"错误转为异常捕获","mdFileName":"core/handleError.md","url":"core/handleError.html","level":1},{"id":23,"parent_id":13,"title":"内部进程间通讯","pageTitle":"内部进程间通讯","mdFileName":"core/processCommunication.md","url":"core/processCommunication.html","level":1},{"id":24,"parent_id":13,"title":"Server 对象","pageTitle":"Server 对象","mdFileName":"core/server.md","url":"core/server.html","level":1},{"id":25,"parent_id":13,"title":"长连接分布式解决方案","pageTitle":"长连接分布式解决方案","mdFileName":"core/long-connection-distributed.md","url":"core/long-connection-distributed.html","level":1},{"id":26,"parent_id":13,"title":"环境变量列表","pageTitle":"环境变量列表","mdFileName":"core/env.md","url":"core/env.html","level":1},{"id":27,"parent_id":13,"title":"内置常量列表","pageTitle":"内置常量列表","mdFileName":"core/consts.md","url":"core/consts.html","level":1},{"id":28,"parent_id":13,"title":"单文件运行 imi（快速启动）","pageTitle":"单文件运行 imi（快速启动）","mdFileName":"core/quickStart.md","url":"core/quickStart.html","level":1},{"id":29,"parent_id":0,"title":"注解","level":0},{"id":30,"parent_id":29,"title":"注入值注解","pageTitle":"注入值注解","mdFileName":"annotations/injectValue.md","url":"annotations/injectValue.html","level":1},{"id":31,"parent_id":29,"title":"方法参数过滤器","pageTitle":"方法参数过滤器","mdFileName":"annotations/filterArg.md","url":"annotations/filterArg.html","level":1},{"id":32,"parent_id":29,"title":"编写自定义注解","pageTitle":"编写自定义注解","mdFileName":"annotations/annotation.md","url":"annotations/annotation.html","level":1},{"id":33,"parent_id":29,"title":"注解管理器","pageTitle":"注解管理器","mdFileName":"annotations/annotationManager.md","url":"annotations/annotationManager.html","level":1},{"id":34,"parent_id":29,"title":"注解相关问题","pageTitle":"注解相关问题","mdFileName":"annotations/qa.md","url":"annotations/qa.html","level":1},{"id":35,"parent_id":0,"title":"多容器","level":0},{"id":36,"parent_id":35,"title":"PHP-FPM","pageTitle":"PHP-FPM","mdFileName":"container/php-fpm.md","url":"container/php-fpm.html","level":1},{"id":37,"parent_id":35,"title":"Swoole","pageTitle":"Swoole","mdFileName":"container/swoole.md","url":"container/swoole.html","level":1},{"id":38,"parent_id":37,"title":"Swoole 环境安装教程","pageTitle":"Swoole 环境安装教程","mdFileName":"base/env.md","url":"base/env.html","level":2},{"id":39,"parent_id":37,"title":"子服务器（单项目多端口多协议）","pageTitle":"Swoole 子服务器（单项目多端口多协议）","mdFileName":"core/subServer.md","url":"core/subServer.html","level":2},{"id":40,"parent_id":37,"title":"单端口支持 WebSocket+Http","pageTitle":"单端口支持 WebSocket+Http","mdFileName":"components/swoole/ws_and_http.md","url":"components/swoole/ws_and_http.html","level":2},{"id":41,"parent_id":37,"title":"热更新","pageTitle":"热更新","mdFileName":"components/hotupdate/index.md","url":"components/hotupdate/index.html","level":2},{"id":42,"parent_id":37,"title":"进程名称管理","pageTitle":"进程名称管理","mdFileName":"core/processNameManager.md","url":"core/processNameManager.html","level":2},{"id":43,"parent_id":37,"title":"工具类","pageTitle":"Coroutine","mdFileName":"utils/Coroutine.md","url":"utils/Coroutine.html","level":2},{"id":44,"parent_id":43,"title":"Coroutine","pageTitle":"Coroutine","mdFileName":"utils/Coroutine.md","url":"utils/Coroutine.html","level":3},{"id":45,"parent_id":43,"title":"Swoole","pageTitle":"SwooleWorker","mdFileName":"utils/Swoole.md","url":"utils/Swoole.html","level":3},{"id":46,"parent_id":43,"title":"ChannelContainer","pageTitle":"ChannelContainer","mdFileName":"utils/ChannelContainer.md","url":"utils/ChannelContainer.html","level":3},{"id":47,"parent_id":37,"title":"命令行工具","pageTitle":"进程工具","mdFileName":"dev/process-swoole.md","url":"dev/process-swoole.html","level":2},{"id":48,"parent_id":47,"title":"进程工具","pageTitle":"进程工具","mdFileName":"dev/process-swoole.md","url":"dev/process-swoole.html","level":3},{"id":49,"parent_id":37,"title":"事件列表","pageTitle":"Swoole 事件列表","mdFileName":"container/swoole/events.md","url":"container/swoole/events.html","level":2},{"id":50,"parent_id":35,"title":"Workerman","pageTitle":"Workerman","mdFileName":"container/workerman.md","url":"container/workerman.html","level":1},{"id":51,"parent_id":50,"title":"服务器配置","pageTitle":"服务器配置","mdFileName":"container/workerman/serverConfig.md","url":"container/workerman/serverConfig.html","level":2},{"id":52,"parent_id":50,"title":"热更新","pageTitle":"热更新","mdFileName":"components/hotupdate/index.md","url":"components/hotupdate/index.html","level":2},{"id":53,"parent_id":50,"title":"命令行工具","pageTitle":"进程工具","mdFileName":"dev/process-workerman.md","url":"dev/process-workerman.html","level":2},{"id":54,"parent_id":53,"title":"进程工具","pageTitle":"进程工具","mdFileName":"dev/process-workerman.md","url":"dev/process-workerman.html","level":3},{"id":55,"parent_id":50,"title":"事件列表","pageTitle":"Workerman 事件列表","mdFileName":"container/workerman/events.md","url":"container/workerman/events.html","level":2},{"id":56,"parent_id":35,"title":"RoadRunner","pageTitle":"RoadRunner","mdFileName":"container/roadrunner.md","url":"container/roadrunner.html","level":1},{"id":57,"parent_id":56,"title":"服务器配置","pageTitle":"服务器配置","mdFileName":"container/roadrunner/serverConfig.md","url":"container/roadrunner/serverConfig.html","level":2},{"id":58,"parent_id":0,"title":"Http 服务","level":0},{"id":59,"parent_id":58,"title":"路由","pageTitle":"路由","mdFileName":"components/httpserver/route.md","url":"components/httpserver/route.html","level":1},{"id":60,"parent_id":58,"title":"控制器","pageTitle":"控制器","mdFileName":"components/httpserver/controller.md","url":"components/httpserver/controller.html","level":1},{"id":61,"parent_id":58,"title":"请求（Request）","pageTitle":"请求类","mdFileName":"components/httpserver/request.md","url":"components/httpserver/request.html","level":1},{"id":62,"parent_id":61,"title":"请求类","pageTitle":"请求类","mdFileName":"components/httpserver/request.md","url":"components/httpserver/request.html","level":2},{"id":63,"parent_id":61,"title":"AOP 拦截请求","pageTitle":"AOP 拦截请求","mdFileName":"components/httpserver/aop.md","url":"components/httpserver/aop.html","level":2},{"id":64,"parent_id":61,"title":"中间件","pageTitle":"中间件","mdFileName":"components/httpserver/middleware.md","url":"components/httpserver/middleware.html","level":2},{"id":65,"parent_id":58,"title":"响应（Response）","pageTitle":"视图","mdFileName":"components/httpserver/view.md","url":"components/httpserver/view.html","level":1},{"id":66,"parent_id":65,"title":"响应类","pageTitle":"响应类","mdFileName":"components/httpserver/response.md","url":"components/httpserver/response.html","level":2},{"id":67,"parent_id":65,"title":"视图","pageTitle":"视图","mdFileName":"components/httpserver/view.md","url":"components/httpserver/view.html","level":2},{"id":68,"parent_id":65,"title":"SSE","pageTitle":"SSE","mdFileName":"components/httpserver/sse.md","url":"components/httpserver/sse.html","level":2},{"id":69,"parent_id":58,"title":"RESTful","pageTitle":"RESTful","mdFileName":"components/httpserver/restful.md","url":"components/httpserver/restful.html","level":1},{"id":70,"parent_id":58,"title":"Session","pageTitle":"Session","mdFileName":"components/httpserver/session.md","url":"components/httpserver/session.html","level":1},{"id":71,"parent_id":58,"title":"JWT","pageTitle":"JWT","mdFileName":"components/httpserver/jwt.md","url":"components/httpserver/jwt.html","level":1},{"id":72,"parent_id":58,"title":"错误异常处理","pageTitle":"错误异常处理","mdFileName":"components/httpserver/error.md","url":"components/httpserver/error.html","level":1},{"id":73,"parent_id":58,"title":"404处理","pageTitle":"404处理","mdFileName":"components/httpserver/404.md","url":"components/httpserver/404.html","level":1},{"id":74,"parent_id":58,"title":"HTTP 验证器","pageTitle":"HTTP 验证器","mdFileName":"components/httpserver/validation.md","url":"components/httpserver/validation.html","level":1},{"id":75,"parent_id":58,"title":"超全局变量","pageTitle":"超全局变量","mdFileName":"components/httpserver/superGlobals.md","url":"components/httpserver/superGlobals.html","level":1},{"id":76,"parent_id":58,"title":"请求最大执行时间","pageTitle":"最大请求执行时间","mdFileName":"components/httpserver/maxExecuteTime.md","url":"components/httpserver/maxExecuteTime.html","level":1},{"id":77,"parent_id":58,"title":"Http2","pageTitle":"Http2","mdFileName":"components/httpserver/http2.md","url":"components/httpserver/http2.html","level":1},{"id":78,"parent_id":58,"title":"跨域和 OPTIONS 请求","pageTitle":"跨域和 OPTIONS 请求","mdFileName":"components/httpserver/cros.md","url":"components/httpserver/cros.html","level":1},{"id":79,"parent_id":58,"title":"HTTPS 配置","pageTitle":"SSL","mdFileName":"components/server/ssl.md","url":"components/server/ssl.html","level":1},{"id":80,"parent_id":58,"title":"Swagger API 文档生成","pageTitle":"Swagger API 文档生成","mdFileName":"dev/generate/swagger.md","url":"dev/generate/swagger.html","level":1},{"id":81,"parent_id":0,"title":"WebSocket 服务","level":0},{"id":82,"parent_id":81,"title":"错误异常处理","pageTitle":"错误异常处理","mdFileName":"components/websocketServer/error.md","url":"components/websocketServer/error.html","level":1},{"id":83,"parent_id":81,"title":"数据处理器","pageTitle":"数据处理器","mdFileName":"components/server/dataParser.md","url":"components/server/dataParser.html","level":1},{"id":84,"parent_id":81,"title":"HTTP 路由","pageTitle":"HTTP 路由","mdFileName":"components/websocketServer/httpRoute.md","url":"components/websocketServer/httpRoute.html","level":1},{"id":85,"parent_id":81,"title":"HTTP 控制器","pageTitle":"HTTP 控制器","mdFileName":"components/websocketServer/httpController.md","url":"components/websocketServer/httpController.html","level":1},{"id":86,"parent_id":81,"title":"WebSocket 路由","pageTitle":"路由","mdFileName":"components/websocketServer/route.md","url":"components/websocketServer/route.html","level":1},{"id":87,"parent_id":81,"title":"WebSocket 控制器","pageTitle":"WebSocket 控制器","mdFileName":"components/websocketServer/websocketController.md","url":"components/websocketServer/websocketController.html","level":1},{"id":88,"parent_id":81,"title":"中间件","pageTitle":"中间件","mdFileName":"components/websocketServer/middleware.md","url":"components/websocketServer/middleware.html","level":1},{"id":89,"parent_id":81,"title":"连接上下文","pageTitle":"连接上下文","mdFileName":"components/websocketServer/session.md","url":"components/websocketServer/session.html","level":1},{"id":90,"parent_id":81,"title":"连接分组","pageTitle":"连接分组","mdFileName":"components/websocketServer/group.md","url":"components/websocketServer/group.html","level":1},{"id":91,"parent_id":81,"title":"断线重连","pageTitle":"断线重连","mdFileName":"components/websocketServer/reconnect.md","url":"components/websocketServer/reconnect.html","level":1},{"id":92,"parent_id":81,"title":"不使用中间件","pageTitle":"不使用中间件","mdFileName":"components/websocketServer/noMiddleware.md","url":"components/websocketServer/noMiddleware.html","level":1},{"id":93,"parent_id":81,"title":"WSS 配置","pageTitle":"SSL","mdFileName":"components/server/ssl.md","url":"components/server/ssl.html","level":1},{"id":94,"parent_id":81,"title":"向客户端推送数据（服务器工具类）","pageTitle":"服务器工具类","mdFileName":"utils/Server.md","url":"utils/Server.html","level":1},{"id":95,"parent_id":81,"title":"WebSocket 客户端","pageTitle":"WebSocket 客户端","mdFileName":"components/websocketServer/client.md","url":"components/websocketServer/client.html","level":1},{"id":96,"parent_id":0,"title":"TCP 服务","level":0},{"id":97,"parent_id":96,"title":"错误异常处理","pageTitle":"错误异常处理","mdFileName":"components/tcpServer/error.md","url":"components/tcpServer/error.html","level":1},{"id":98,"parent_id":96,"title":"数据处理器","pageTitle":"数据处理器","mdFileName":"components/server/dataParser.md","url":"components/server/dataParser.html","level":1},{"id":99,"parent_id":96,"title":"路由","pageTitle":"路由","mdFileName":"components/tcpServer/route.md","url":"components/tcpServer/route.html","level":1},{"id":100,"parent_id":96,"title":"TCP 控制器","pageTitle":"TCP 控制器","mdFileName":"components/tcpServer/controller.md","url":"components/tcpServer/controller.html","level":1},{"id":101,"parent_id":96,"title":"中间件","pageTitle":"中间件","mdFileName":"components/tcpServer/middleware.md","url":"components/tcpServer/middleware.html","level":1},{"id":102,"parent_id":96,"title":"连接上下文","pageTitle":"连接上下文","mdFileName":"components/websocketServer/session.md","url":"components/websocketServer/session.html","level":1},{"id":103,"parent_id":96,"title":"连接分组","pageTitle":"连接分组","mdFileName":"components/websocketServer/group.md","url":"components/websocketServer/group.html","level":1},{"id":104,"parent_id":96,"title":"断线重连","pageTitle":"断线重连","mdFileName":"components/websocketServer/reconnect.md","url":"components/websocketServer/reconnect.html","level":1},{"id":105,"parent_id":96,"title":"不使用中间件","pageTitle":"不使用中间件","mdFileName":"components/tcpServer/noMiddleware.md","url":"components/tcpServer/noMiddleware.html","level":1},{"id":106,"parent_id":96,"title":"向客户端推送数据（服务器工具类）","pageTitle":"服务器工具类","mdFileName":"utils/Server.md","url":"utils/Server.html","level":1},{"id":107,"parent_id":0,"title":"UDP 服务","level":0},{"id":108,"parent_id":107,"title":"错误异常处理","pageTitle":"错误异常处理","mdFileName":"components/udpServer/error.md","url":"components/udpServer/error.html","level":1},{"id":109,"parent_id":107,"title":"数据处理器","pageTitle":"数据处理器","mdFileName":"components/server/dataParser.md","url":"components/server/dataParser.html","level":1},{"id":110,"parent_id":107,"title":"路由","pageTitle":"路由","mdFileName":"components/udpServer/route.md","url":"components/udpServer/route.html","level":1},{"id":111,"parent_id":107,"title":"UDP 控制器","pageTitle":"UDP 控制器","mdFileName":"components/udpServer/controller.md","url":"components/udpServer/controller.html","level":1},{"id":112,"parent_id":107,"title":"中间件","pageTitle":"中间件","mdFileName":"components/udpServer/middleware.md","url":"components/udpServer/middleware.html","level":1},{"id":113,"parent_id":107,"title":"不使用中间件","pageTitle":"不使用中间件","mdFileName":"components/udpServer/noMiddleware.md","url":"components/udpServer/noMiddleware.html","level":1},{"id":114,"parent_id":0,"title":"MQTT","level":0},{"id":115,"parent_id":114,"title":"MQTT 服务端","pageTitle":"MQTT 服务端","mdFileName":"components/mqtt/server.md","url":"components/mqtt/server.html","level":1},{"id":116,"parent_id":114,"title":"MQTT 客户端","pageTitle":"MQTT 客户端","mdFileName":"components/mqtt/client.md","url":"components/mqtt/client.html","level":1},{"id":117,"parent_id":0,"title":"RPC 服务","level":0},{"id":118,"parent_id":117,"title":"Hprose","pageTitle":"Hprose","mdFileName":"components/rpc/hprose.md","url":"components/rpc/hprose.html","level":1},{"id":119,"parent_id":117,"title":"gRPC","pageTitle":"gRPC 服务开发","mdFileName":"components/rpc/grpc.md","url":"components/rpc/grpc.html","level":1},{"id":120,"parent_id":119,"title":"gRPC 服务开发","pageTitle":"gRPC 服务开发","mdFileName":"components/rpc/grpc.md","url":"components/rpc/grpc.html","level":2},{"id":121,"parent_id":119,"title":"Protobuf","pageTitle":"Protobuf","mdFileName":"components/rpc/grpc-protobuf.md","url":"components/rpc/grpc-protobuf.html","level":2},{"id":122,"parent_id":119,"title":"gRPC 的 HTTP 代理网关","pageTitle":"gRPC 的 HTTP 代理网关","mdFileName":"components/rpc/grpc-proxy.md","url":"components/rpc/grpc-proxy.html","level":2},{"id":123,"parent_id":0,"title":"功能组件","level":0},{"id":124,"parent_id":123,"title":"配置","pageTitle":"配置(Config)","mdFileName":"components/config/index.md","url":"components/config/index.html","level":1},{"id":125,"parent_id":124,"title":"配置读写","pageTitle":"配置(Config)","mdFileName":"components/config/index.md","url":"components/config/index.html","level":2},{"id":126,"parent_id":124,"title":"配置中心","pageTitle":"配置中心","mdFileName":"components/config/center.md","url":"components/config/center.html","level":2},{"id":127,"parent_id":123,"title":"连接池","pageTitle":"连接池","mdFileName":"components/pool/index.md","url":"components/pool/index.html","level":1},{"id":128,"parent_id":123,"title":"关系型数据库 (Db)","pageTitle":"数据库操作","mdFileName":"components/db/index.md","url":"components/db/index.html","level":1},{"id":129,"parent_id":128,"title":"数据库驱动","pageTitle":"数据库操作","mdFileName":"components/db/index.md","url":"components/db/index.html","level":2},{"id":130,"parent_id":129,"title":"MySQL","pageTitle":"MySQL","mdFileName":"components/db/mysql.md","url":"components/db/mysql.html","level":3},{"id":131,"parent_id":129,"title":"PostgreSQL","pageTitle":"PostgreSQL","mdFileName":"components/db/pgsql.md","url":"components/db/pgsql.html","level":3},{"id":132,"parent_id":128,"title":"数据库配置","pageTitle":"连接池配置","mdFileName":"components/db/config.md","url":"components/db/config.html","level":2},{"id":133,"parent_id":128,"title":"数据库操作","pageTitle":"数据库操作","mdFileName":"components/db/index.md","url":"components/db/index.html","level":2},{"id":134,"parent_id":128,"title":"SQL 监听","pageTitle":"SQL 监听","mdFileName":"components/db/sqlListener.md","url":"components/db/sqlListener.html","level":2},{"id":135,"parent_id":123,"title":"ORM","pageTitle":"ORM","mdFileName":"components/orm/index.md","url":"components/orm/index.html","level":1},{"id":136,"parent_id":135,"title":"使用说明","pageTitle":"ORM","mdFileName":"components/orm/index.md","url":"components/orm/index.html","level":2},{"id":137,"parent_id":135,"title":"数据库表模型","pageTitle":"模型用法","mdFileName":"components/orm/RDModel.md","url":"components/orm/RDModel.html","level":2},{"id":138,"parent_id":137,"title":"模型配置","pageTitle":"模型配置","mdFileName":"components/orm/config.md","url":"components/orm/config.html","level":3},{"id":139,"parent_id":137,"title":"模型定义","pageTitle":"数据库模型","mdFileName":"components/orm/RDModel/definition.md","url":"components/orm/RDModel/definition.html","level":3},{"id":140,"parent_id":137,"title":"模型生成","pageTitle":"模型生成","mdFileName":"dev/generate/model.md","url":"dev/generate/model.html","level":3},{"id":141,"parent_id":137,"title":"模型用法","pageTitle":"模型用法","mdFileName":"components/orm/RDModel.md","url":"components/orm/RDModel.html","level":3},{"id":142,"parent_id":137,"title":"从模型生成表","pageTitle":"从模型生成表","mdFileName":"dev/generate/table.md","url":"dev/generate/table.html","level":3},{"id":143,"parent_id":137,"title":"模型事件","pageTitle":"模型事件","mdFileName":"components/orm/RDModel/event.md","url":"components/orm/RDModel/event.html","level":3},{"id":144,"parent_id":137,"title":"树形表模型","pageTitle":"TreeModel","mdFileName":"components/orm/TreeModel.md","url":"components/orm/TreeModel.html","level":3},{"id":145,"parent_id":137,"title":"模型软删除","pageTitle":"模型软删除","mdFileName":"components/orm/softDelete.md","url":"components/orm/softDelete.html","level":3},{"id":146,"parent_id":135,"title":"模型关联","pageTitle":"介绍","mdFileName":"components/orm/relation/index.md","url":"components/orm/relation/index.html","level":2},{"id":147,"parent_id":146,"title":"使用说明","pageTitle":"介绍","mdFileName":"components/orm/relation/index.md","url":"components/orm/relation/index.html","level":3},{"id":148,"parent_id":146,"title":"一对一关联","pageTitle":"一对一关联","mdFileName":"components/orm/relation/oneToOne.md","url":"components/orm/relation/oneToOne.html","level":3},{"id":149,"parent_id":146,"title":"一对多关联","pageTitle":"一对多关联","mdFileName":"components/orm/relation/oneToMany.md","url":"components/orm/relation/oneToMany.html","level":3},{"id":150,"parent_id":146,"title":"多对多关联","pageTitle":"多对多关联","mdFileName":"components/orm/relation/manyToMany.md","url":"components/orm/relation/manyToMany.html","level":3},{"id":151,"parent_id":146,"title":"多态一对一关联","pageTitle":"多态一对一关联","mdFileName":"components/orm/relation/polymorphicOneToOne.md","url":"components/orm/relation/polymorphicOneToOne.html","level":3},{"id":152,"parent_id":146,"title":"多态一对多关联","pageTitle":"多态一对多关联","mdFileName":"components/orm/relation/polymorphicOneToMany.md","url":"components/orm/relation/polymorphicOneToMany.html","level":3},{"id":153,"parent_id":146,"title":"多态多对多关联","pageTitle":"多态多对多关联","mdFileName":"components/orm/relation/polymorphicManyToMany.md","url":"components/orm/relation/polymorphicManyToMany.html","level":3},{"id":154,"parent_id":146,"title":"自定义关联","pageTitle":"自定义关联","mdFileName":"components/orm/relation/relation.md","url":"components/orm/relation/relation.html","level":3},{"id":155,"parent_id":146,"title":"前置和后置事件","pageTitle":"前置和后置事件","mdFileName":"components/orm/relation/events.md","url":"components/orm/relation/events.html","level":3},{"id":156,"parent_id":135,"title":"数据库迁移","pageTitle":"数据库迁移","mdFileName":"components/orm/migration.md","url":"components/orm/migration.html","level":2},{"id":157,"parent_id":123,"title":"Redis","pageTitle":"Redis","mdFileName":"components/redis/index.md","url":"components/redis/index.html","level":1},{"id":158,"parent_id":123,"title":"Redis 模型","pageTitle":"Redis 模型","mdFileName":"components/orm/RedisModel.md","url":"components/orm/RedisModel.html","level":1},{"id":159,"parent_id":123,"title":"内存表模型","pageTitle":"内存表模型","mdFileName":"components/orm/MemoryTableModel.md","url":"components/orm/MemoryTableModel.html","level":1},{"id":160,"parent_id":123,"title":"缓存","pageTitle":"缓存","mdFileName":"components/cache/index.md","url":"components/cache/index.html","level":1},{"id":161,"parent_id":160,"title":"使用说明","pageTitle":"缓存","mdFileName":"components/cache/index.md","url":"components/cache/index.html","level":2},{"id":162,"parent_id":160,"title":"文件缓存","pageTitle":"文件缓存","mdFileName":"components/cache/file.md","url":"components/cache/file.html","level":2},{"id":163,"parent_id":160,"title":"Redis 缓存","pageTitle":"Redis 缓存","mdFileName":"components/cache/redis.md","url":"components/cache/redis.html","level":2},{"id":164,"parent_id":160,"title":"RedisHash 缓存","pageTitle":"RedisHash 缓存","mdFileName":"components/cache/redisHash.md","url":"components/cache/redisHash.html","level":2},{"id":165,"parent_id":160,"title":"Apcu 缓存","pageTitle":"Apcu 缓存","mdFileName":"components/cache/apcu.md","url":"components/cache/apcu.html","level":2},{"id":166,"parent_id":160,"title":"请求上下文缓存","pageTitle":"请求上下文缓存","mdFileName":"components/cache/requestContext.md","url":"components/cache/requestContext.html","level":2},{"id":167,"parent_id":160,"title":"内存缓存","pageTitle":"内存缓存","mdFileName":"components/cache/memory.md","url":"components/cache/memory.html","level":2},{"id":168,"parent_id":123,"title":"日志","pageTitle":"日志","mdFileName":"components/log/index.md","url":"components/log/index.html","level":1},{"id":169,"parent_id":123,"title":"验证器","pageTitle":"验证器","mdFileName":"components/validation/index.md","url":"components/validation/index.html","level":1},{"id":170,"parent_id":123,"title":"门面 (Facade)","pageTitle":"门面 (Facade)","mdFileName":"components/facade/index.md","url":"components/facade/index.html","level":1},{"id":171,"parent_id":123,"title":"请求上下文代理 (RequestContextProxy)","pageTitle":"请求上下文代理（RequestContextProxy）","mdFileName":"components/requestContextProxy/index.md","url":"components/requestContextProxy/index.html","level":1},{"id":172,"parent_id":123,"title":"Lock 锁","pageTitle":"锁","mdFileName":"components/lock/index.md","url":"components/lock/index.html","level":1},{"id":173,"parent_id":172,"title":"使用方法","pageTitle":"锁","mdFileName":"components/lock/index.md","url":"components/lock/index.html","level":2},{"id":174,"parent_id":172,"title":"RedisLock","pageTitle":"RedisLock","mdFileName":"components/lock/redis.md","url":"components/lock/redis.html","level":2},{"id":175,"parent_id":172,"title":"AtomicLock","pageTitle":"AtomicLock","mdFileName":"components/lock/atomic.md","url":"components/lock/atomic.html","level":2},{"id":176,"parent_id":123,"title":"后台任务","pageTitle":"后台任务","mdFileName":"components/task/index.md","url":"components/task/index.html","level":1},{"id":177,"parent_id":123,"title":"定时任务","pageTitle":"定时任务","mdFileName":"components/task/cron.md","url":"components/task/cron.html","level":1},{"id":178,"parent_id":123,"title":"AOP","pageTitle":"AOP","mdFileName":"components/aop/index.md","url":"components/aop/index.html","level":1},{"id":179,"parent_id":123,"title":"进程","pageTitle":"进程","mdFileName":"components/process/index.md","url":"components/process/index.html","level":1},{"id":180,"parent_id":123,"title":"进程池-Swoole","pageTitle":"进程池-Swoole","mdFileName":"components/process-pool/swoole.md","url":"components/process-pool/swoole.html","level":1},{"id":181,"parent_id":123,"title":"进程池-imi","pageTitle":"进程池-imi","mdFileName":"components/process-pool/imi.md","url":"components/process-pool/imi.html","level":1},{"id":182,"parent_id":123,"title":"定时器","pageTitle":"定时器","mdFileName":"components/timer/index.md","url":"components/timer/index.html","level":1},{"id":183,"parent_id":123,"title":"异步执行","pageTitle":"异步执行","mdFileName":"components/async/index.md","url":"components/async/index.html","level":1},{"id":184,"parent_id":123,"title":"雪花算法发号器","pageTitle":"雪花算法发号器","mdFileName":"components/snowflake.md","url":"components/snowflake.html","level":1},{"id":185,"parent_id":123,"title":"宏定义","pageTitle":"宏定义","mdFileName":"components/macro.md","url":"components/macro.html","level":1},{"id":186,"parent_id":123,"title":"Phar打包器","pageTitle":"Phar 支持","mdFileName":"components/phar/index.md","url":"components/phar/index.html","level":1},{"id":187,"parent_id":123,"title":"imi 组件列表一览","pageTitle":"imi 组件列表一览","mdFileName":"components/list.md","url":"components/list.html","level":1},{"id":188,"parent_id":187,"title":"PostgreSQL","pageTitle":"PostgreSQL","mdFileName":"components/db/pgsql.md","url":"components/db/pgsql.html","level":2},{"id":189,"parent_id":187,"title":"MQTT","pageTitle":"MQTT 服务端","mdFileName":"components/mqtt/server.md","url":"components/mqtt/server.html","level":2},{"id":190,"parent_id":187,"title":"gRPC","pageTitle":"gRPC 服务开发","mdFileName":"components/rpc/grpc.md","url":"components/rpc/grpc.html","level":2},{"id":191,"parent_id":187,"title":"Hprose","pageTitle":"Hprose","mdFileName":"components/rpc/hprose.md","url":"components/rpc/hprose.html","level":2},{"id":192,"parent_id":187,"title":"消息队列","pageTitle":"Redis 消息队列","mdFileName":"components/mq/redis.md","url":"components/mq/redis.html","level":2},{"id":193,"parent_id":187,"title":"AMQP","pageTitle":"AMQP","mdFileName":"components/mq/amqp.md","url":"components/mq/amqp.html","level":2},{"id":194,"parent_id":187,"title":"Kafka","pageTitle":"Kafka","mdFileName":"components/mq/kafka.md","url":"components/mq/kafka.html","level":2},{"id":195,"parent_id":187,"title":"JWT","pageTitle":"JWT","mdFileName":"components/httpserver/jwt.md","url":"components/httpserver/jwt.html","level":2},{"id":196,"parent_id":187,"title":"权限控制","pageTitle":"权限控制","mdFileName":"components/access-control.md","url":"components/access-control.html","level":2},{"id":197,"parent_id":187,"title":"Smarty 模版引擎","pageTitle":"Smarty 模版引擎","mdFileName":"components/smarty.md","url":"components/smarty.html","level":2},{"id":198,"parent_id":187,"title":"限流","pageTitle":"限流","mdFileName":"components/rate-limit.md","url":"components/rate-limit.html","level":2},{"id":199,"parent_id":187,"title":"跨进程变量共享","pageTitle":"跨进程变量共享","mdFileName":"components/shared-memory.md","url":"components/shared-memory.html","level":2},{"id":200,"parent_id":187,"title":"雪花算法发号器","pageTitle":"雪花算法发号器","mdFileName":"components/snowflake.md","url":"components/snowflake.html","level":2},{"id":201,"parent_id":187,"title":"Swagger API 文档生成","pageTitle":"Swagger API 文档生成","mdFileName":"dev/generate/swagger.md","url":"dev/generate/swagger.html","level":2},{"id":202,"parent_id":187,"title":"Swoole Tracker","pageTitle":"Swoole Tracker","mdFileName":"components/swoole-tracker.md","url":"components/swoole-tracker.html","level":2},{"id":203,"parent_id":187,"title":"InfluxDB","pageTitle":"InfluxDB","mdFileName":"components/influxdb.md","url":"components/influxdb.html","level":2},{"id":204,"parent_id":187,"title":"TDengine","pageTitle":"TDengine","mdFileName":"components/tdengine.md","url":"components/tdengine.html","level":2},{"id":205,"parent_id":0,"title":"消息队列","level":0},{"id":206,"parent_id":205,"title":"Redis","pageTitle":"Redis 消息队列","mdFileName":"components/mq/redis.md","url":"components/mq/redis.html","level":1},{"id":207,"parent_id":205,"title":"Redis Stream","pageTitle":"Redis Stream 消息队列","mdFileName":"components/mq/redisStream.md","url":"components/mq/redisStream.html","level":1},{"id":208,"parent_id":205,"title":"RabbitMQ(AMQP)","pageTitle":"AMQP","mdFileName":"components/mq/amqp.md","url":"components/mq/amqp.html","level":1},{"id":209,"parent_id":205,"title":"Kafka","pageTitle":"Kafka","mdFileName":"components/mq/kafka.md","url":"components/mq/kafka.html","level":1},{"id":210,"parent_id":0,"title":"微服务","level":0},{"id":211,"parent_id":210,"title":"配置中心","pageTitle":"配置中心","mdFileName":"components/config/center.md","url":"components/config/center.html","level":1},{"id":212,"parent_id":211,"title":"通过配置中心配置连接池","pageTitle":"通过配置中心配置连接池","mdFileName":"components/config/pool.md","url":"components/config/pool.html","level":2},{"id":213,"parent_id":210,"title":"服务注册","pageTitle":"服务注册","mdFileName":"components/serviceRegistry/index.md","url":"components/serviceRegistry/index.html","level":1},{"id":214,"parent_id":210,"title":"服务发现（负载均衡）","pageTitle":"服务发现（负载均衡）","mdFileName":"components/serviceDiscovery/index.md","url":"components/serviceDiscovery/index.html","level":1},{"id":215,"parent_id":210,"title":"调用链路追踪","pageTitle":"调用链路追踪","mdFileName":"components/tracing/index.md","url":"components/tracing/index.html","level":1},{"id":216,"parent_id":215,"title":"Zipkin","pageTitle":"OpenTracing","mdFileName":"components/tracing/opentracing.md","url":"components/tracing/opentracing.html#Zipkin","level":2},{"id":217,"parent_id":215,"title":"Jaeger","pageTitle":"OpenTracing","mdFileName":"components/tracing/opentracing.md","url":"components/tracing/opentracing.html#Jaeger","level":2},{"id":218,"parent_id":215,"title":"Swoole Tracker","pageTitle":"Swoole Tracker","mdFileName":"components/swoole-tracker.md","url":"components/swoole-tracker.html","level":2},{"id":219,"parent_id":210,"title":"服务指标监控","pageTitle":"服务指标监控","mdFileName":"components/meter/index.md","url":"components/meter/index.html","level":1},{"id":220,"parent_id":219,"title":"Prometheus","pageTitle":"Prometheus","mdFileName":"components/meter/prometheus.md","url":"components/meter/prometheus.html","level":2},{"id":221,"parent_id":219,"title":"InfluxDB","pageTitle":"InfluxDB","mdFileName":"components/meter/influxdb.md","url":"components/meter/influxdb.html","level":2},{"id":222,"parent_id":219,"title":"TDengine","pageTitle":"TDengine","mdFileName":"components/meter/tdengine.md","url":"components/meter/tdengine.html","level":2},{"id":223,"parent_id":210,"title":"服务限流","pageTitle":"限流","mdFileName":"components/rate-limit.md","url":"components/rate-limit.html","level":1},{"id":224,"parent_id":0,"title":"数据结构","level":0},{"id":225,"parent_id":224,"title":"通用数据结构","pageTitle":"枚举","mdFileName":"components/struct/enum.md","url":"components/struct/enum.html","level":1},{"id":226,"parent_id":225,"title":"Enum(枚举)","pageTitle":"枚举","mdFileName":"components/struct/enum.md","url":"components/struct/enum.html","level":2},{"id":227,"parent_id":225,"title":"ArrayData(数组数据)","pageTitle":"ArrayData","mdFileName":"components/struct/ArrayData.md","url":"components/struct/ArrayData.html","level":2},{"id":228,"parent_id":225,"title":"LazyArrayObject(智能数组对象)","pageTitle":"LazyArrayObject","mdFileName":"components/struct/LazyArrayObject.md","url":"components/struct/LazyArrayObject.html","level":2},{"id":229,"parent_id":225,"title":"ArrayList(数组列表)","pageTitle":"ArrayList","mdFileName":"components/struct/ArrayList.md","url":"components/struct/ArrayList.html","level":2},{"id":230,"parent_id":225,"title":"FilterableList(过滤器列表)","pageTitle":"FilterableList","mdFileName":"components/struct/FilterableList.md","url":"components/struct/FilterableList.html","level":2},{"id":231,"parent_id":224,"title":"Swoole 数据结构","pageTitle":"Atomic","mdFileName":"components/struct/atomic.md","url":"components/struct/atomic.html","level":1},{"id":232,"parent_id":231,"title":"Atomic(原子性)","pageTitle":"Atomic","mdFileName":"components/struct/atomic.md","url":"components/struct/atomic.html","level":2},{"id":233,"parent_id":231,"title":"Channel(通道)","pageTitle":"协程 Channel","mdFileName":"components/struct/co-channel.md","url":"components/struct/co-channel.html","level":2},{"id":234,"parent_id":231,"title":"MemoryTable(内存表)","pageTitle":"MemoryTable","mdFileName":"components/struct/memory-table.md","url":"components/struct/memory-table.html","level":2},{"id":235,"parent_id":0,"title":"通用工具类","level":0},{"id":236,"parent_id":235,"title":"App 类","pageTitle":"App 类","mdFileName":"utils/app.md","url":"utils/app.html","level":1},{"id":237,"parent_id":235,"title":"全局函数","pageTitle":"全局函数","mdFileName":"utils/functions.md","url":"utils/functions.html","level":1},{"id":238,"parent_id":235,"title":"Imi","pageTitle":"Imi","mdFileName":"utils/Imi.md","url":"utils/Imi.html","level":1},{"id":239,"parent_id":235,"title":"Worker","pageTitle":"Worker","mdFileName":"utils/Worker.md","url":"utils/Worker.html","level":1},{"id":240,"parent_id":235,"title":"ArrayUtil","pageTitle":"ArrayUtil","mdFileName":"utils/ArrayUtil.md","url":"utils/ArrayUtil.html","level":1},{"id":241,"parent_id":235,"title":"Bit","pageTitle":"Bit","mdFileName":"utils/Bit.md","url":"utils/Bit.html","level":1},{"id":242,"parent_id":235,"title":"ClassObject","pageTitle":"ClassObject","mdFileName":"utils/ClassObject.md","url":"utils/ClassObject.html","level":1},{"id":243,"parent_id":235,"title":"File","pageTitle":"File","mdFileName":"utils/File.md","url":"utils/File.html","level":1},{"id":244,"parent_id":235,"title":"ObjectArrayHelper","pageTitle":"ObjectArrayHelper","mdFileName":"utils/ObjectArrayHelper.md","url":"utils/ObjectArrayHelper.html","level":1},{"id":245,"parent_id":235,"title":"Random","pageTitle":"Random","mdFileName":"utils/Random.md","url":"utils/Random.html","level":1},{"id":246,"parent_id":235,"title":"Text","pageTitle":"Text","mdFileName":"utils/Text.md","url":"utils/Text.html","level":1},{"id":247,"parent_id":235,"title":"Pagination","pageTitle":"Pagination","mdFileName":"utils/Pagination.md","url":"utils/Pagination.html","level":1},{"id":248,"parent_id":235,"title":"DateTime","pageTitle":"DateTime","mdFileName":"utils/DateTime.md","url":"utils/DateTime.html","level":1},{"id":249,"parent_id":235,"title":"ServerManager","pageTitle":"ServerManage","mdFileName":"utils/ServerManager.md","url":"utils/ServerManager.html","level":1},{"id":250,"parent_id":235,"title":"ExpiredStorage","pageTitle":"ExpiredStorage","mdFileName":"utils/ExpiredStorage.md","url":"utils/ExpiredStorage.html","level":1},{"id":251,"parent_id":235,"title":"服务器工具类","pageTitle":"服务器工具类","mdFileName":"utils/Server.md","url":"utils/Server.html","level":1},{"id":252,"parent_id":0,"title":"开发工具","level":0},{"id":253,"parent_id":252,"title":"介绍","pageTitle":"介绍","mdFileName":"dev/intro.md","url":"dev/intro.html","level":1},{"id":254,"parent_id":252,"title":"生成工具","pageTitle":"生成工具","mdFileName":"dev/generate.md","url":"dev/generate.html","level":1},{"id":255,"parent_id":254,"title":"模型生成","pageTitle":"模型生成","mdFileName":"dev/generate/model.md","url":"dev/generate/model.html","level":2},{"id":256,"parent_id":254,"title":"表生成","pageTitle":"从模型生成表","mdFileName":"dev/generate/table.md","url":"dev/generate/table.html","level":2},{"id":257,"parent_id":254,"title":"控制器生成","pageTitle":"控制器生成","mdFileName":"dev/generate/controller.md","url":"dev/generate/controller.html","level":2},{"id":258,"parent_id":252,"title":"自己动手开发命令行工具","pageTitle":"自己动手开发命令行工具","mdFileName":"dev/tool.md","url":"dev/tool.html","level":1},{"id":259,"parent_id":0,"title":"进阶开发","level":0},{"id":260,"parent_id":259,"title":"断点调试","pageTitle":"断点调试","mdFileName":"adv/debug.md","url":"adv/debug.html","level":1},{"id":261,"parent_id":259,"title":"生产环境性能优化","pageTitle":"生产环境性能优化","mdFileName":"adv/performance.md","url":"adv/performance.html","level":1},{"id":262,"parent_id":0,"title":"运行环境","level":0},{"id":263,"parent_id":262,"title":"Docker","pageTitle":"Docker","mdFileName":"production/docker.md","url":"production/docker.html","level":1},{"id":264,"parent_id":262,"title":"守护进程","pageTitle":"守护进程","mdFileName":"production/daemon.md","url":"production/daemon.html","level":1},{"id":265,"parent_id":262,"title":"Swoole Compiler 代码加密","pageTitle":"Swoole Compiler 代码加密","mdFileName":"production/swoole-compiler.md","url":"production/swoole-compiler.html","level":1},{"id":266,"parent_id":0,"title":"Swoole 协程化组件","level":0},{"id":267,"parent_id":266,"title":"Guzzle","pageTitle":"Guzzle","mdFileName":"other/guzzle.md","url":"other/guzzle.html","level":1},{"id":268,"parent_id":266,"title":"ElasticSearch","pageTitle":"ElasticSearch","mdFileName":"other/elasticsearch.md","url":"other/elasticsearch.html","level":1},{"id":269,"parent_id":266,"title":"YurunHttp","pageTitle":"YurunHttp","mdFileName":"other/yurunhttp.md","url":"other/yurunhttp.html","level":1},{"id":270,"parent_id":266,"title":"第三方授权 SDK","pageTitle":"第三方授权 SDK","mdFileName":"other/yurun-oauth-login.md","url":"other/yurun-oauth-login.html","level":1},{"id":271,"parent_id":266,"title":"第三方支付 SDK","pageTitle":"第三方支付 SDK","mdFileName":"other/paysdk.md","url":"other/paysdk.html","level":1}];
+                    for(var i = 0; i < catalogList.length; ++i)
+                    {
+                        if(void 0 !== catalogList[i].url)
+                        {
+                            catalogList[i].url = rootPath + catalogList[i].url;
+                        }
+                    }
+                    initTree(catalogList);
+                </script>
+                <h1 id="数据库操作"><a href="#数据库操作">数据库操作</a></h1><p><div id="content-toc-wrap"><p class="content-toc-title">目录</p><div id="content-toc"></div></div></p><h2 id="Db 驱动对象操作"><a href="#Db 驱动对象操作">Db 驱动对象操作</a></h2><p>用于直接执行 SQL</p><pre><code class="php">// 获取数据库连接实例，每个RequestContext中共用一个
+$db = Db::getInstance();
+// 读库
+$db = Db::getInstance($poolName, QueryType::READ);
+// 写库
+$db = Db::getInstance($poolName, QueryType::WRITE);
+
+// ---
+
+// 执行 SQL 并返回受影响的行数
+// public static function exec(string $sql, array $bindValues = [], ?string $poolName = null, int $queryType = QueryType::WRITE): int
+$rows = Db::exec(&#039;update tb_xxx set age=111 where id=?&#039;, [123]);
+
+// 执行 SQL 返回结果
+// public static function select(string $sql, array $bindValues = [], ?string $poolName = null, int $queryType = QueryType::WRITE): ?IResult
+$result = Db::select(&#039;select * from tb_xxx id=?&#039;, [123]);
+var_dump($result-&gt;getArray()); // 更多用法参考文档
+
+// 预处理
+$stmt = Db::prepare(&#039;select * from tb_xxx id=?&#039;);
+$stmt-&gt;execute([123]);
+var_dump($stmt-&gt;fetchAll()); // 更多用法参考文档
+
+// ---
+
+// 获取新的数据库连接实例
+$db = Db::getNewInstance();
+// 读库
+$db = Db::getNewInstance($poolName, QueryType::READ);
+// 写库
+$db = Db::getNewInstance($poolName, QueryType::WRITE);
+// 释放连接，回归连接池，配合 getNewInstance() 使用
+Db::release($db);
+
+// ---
+
+$returnValue = Db::use(function(IDb $db){
+    // 操作 $db
+    return &#039;imi&#039;;
+}); // imi</code></pre><h3 id="方法"><a href="#方法">方法</a></h3><pre><code class="php">/**
+ * 打开
+ */
+public function open(): bool;
+
+/**
+ * 关闭.
+ */
+public function close(): void;
+
+/**
+ * 是否已连接.
+ */
+public function isConnected(): bool;
+
+/**
+ * ping 检查是否已连接.
+ */
+public function ping(): bool;
+
+/**
+ * 启动一个事务
+ */
+public function beginTransaction(): bool;
+
+/**
+ * 提交一个事务
+ */
+public function commit(): bool;
+
+/**
+ * 回滚事务
+ * 支持设置回滚事务层数，如果不设置则为全部回滚.
+ */
+public function rollBack(?int $levels = null): bool;
+
+/**
+ * 获取事务层数.
+ */
+public function getTransactionLevels(): int;
+
+/**
+ * 返回错误码
+ *
+ * @return mixed
+ */
+public function errorCode();
+
+/**
+ * 返回错误信息.
+ */
+public function errorInfo(): string;
+
+/**
+ * 获取最后一条执行的SQL语句.
+ */
+public function lastSql(): string;
+
+/**
+ * 执行一条 SQL 语句，并返回受影响的行数.
+ */
+public function exec(string $sql): int;
+
+/**
+ * 批量执行 SQL，返回查询结果.
+ */
+public function batchExec(string $sql): array;
+
+/**
+ * 取回一个数据库连接的属性.
+ *
+ * @param mixed $attribute
+ *
+ * @return mixed
+ */
+public function getAttribute($attribute);
+
+/**
+ * 设置属性.
+ *
+ * @param mixed $attribute
+ * @param mixed $value
+ */
+public function setAttribute($attribute, $value): bool;
+
+/**
+ * 检查是否在一个事务内.
+ */
+public function inTransaction(): bool;
+
+/**
+ * 返回最后插入行的ID或序列值
+ */
+public function lastInsertId(?string $name = null): string;
+
+/**
+ * 返回受上一个 SQL 语句影响的行数.
+ */
+public function rowCount(): int;
+
+/**
+ * 准备执行语句并返回一个语句对象
+ */
+public function prepare(string $sql, array $driverOptions = []): \Imi\Db\Interfaces\IStatement;
+
+/**
+ * 执行一条SQL语句，返回一个结果集作为PDOStatement对象
+ */
+public function query(string $sql): \Imi\Db\Interfaces\IStatement;
+
+/**
+ * 获取原对象实例.
+ *
+ * @return object
+ */
+public function getInstance();
+
+/**
+ * Get 事务管理.
+ */
+public function getTransaction(): \Imi\Db\Transaction\Transaction;
+
+/**
+ * 创建查询构建器.
+ */
+public function createQuery(?string $modelClass = null): \Imi\Db\Query\Interfaces\IQuery;</code></pre><h2 id="预处理"><a href="#预处理">预处理</a></h2><p>使用预处理可以防止 SQL 注入。</p><pre><code class="php">$db = Db::getNewInstance();
+
+$stmt = $db-&gt;prepare(&#039;select ?&#039;); // 预处理问号形式
+$stmt-&gt;execute([1]); // 执行只能传索引数组
+
+$stmt = $db-&gt;prepare(&#039;select :abc&#039;); // 预处理定义参数名
+$stmt-&gt;execute([&#039;:abc&#039; =&gt; 1]); // 执行可以带冒号传参
+$stmt-&gt;execute([&#039;abc&#039; =&gt; 1]); // 执行可以不带冒号传参</code></pre><h2 id="查询构建器"><a href="#查询构建器">查询构建器</a></h2><p>imi 中数据库查询连贯操作都来自于查询器，查询器的创建方式：</p><pre><code class="php">use Imi\Db\Db;
+$query = Db::query();
+$query = Db::query(&#039;mysql2&#039;); // 指定连接池名
+$query = Db::query(&#039;mysql2&#039;, XXXModel::class); // 指定模型名
+$query = Db::query(&#039;mysql2&#039;, XXXModel::class, \Imi\Db\Query\QueryType::READ); // 从库</code></pre><h3 id="事务"><a href="#事务">事务</a></h3><p>获取连接顺带自动开启/提交/回滚事务：</p><pre><code class="php">Db::transUse(function(IDb $db){
+
+});
+Db::transUse(function(IDb $db){
+
+}, $poolName, QueryType::WRITE);</code></pre><blockquote><code>Db::transUse()</code> 不能在回调中使用模型</blockquote><p>获取连接后，想要使用某个连接，执行事务操作，自动开启/提交/回滚事务：</p><pre><code class="php">$db = Db::getInstance();
+Db::trans($db, function(IDb $db){
+
+});</code></pre><blockquote>可以使用模型</blockquote><p>使用回调来使用当前上下文中的资源：</p><pre><code class="php">Db::transContext(function(IDb $db){
+
+});
+Db::transContext(function(IDb $db){
+
+}, $poolName, QueryType::WRITE);</code></pre><blockquote>可以使用模型</blockquote><p>手动控制事务：（不推荐）</p><pre><code class="php">// 开启事务
+Db::getInstance()-&gt;beginTransaction();
+// 提交事务
+Db::getInstance()-&gt;commit();
+// 回滚事务
+Db::getInstance()-&gt;rollBack();</code></pre><p><strong>自动事务处理：</strong></p><p><code>@Transaction</code> 注解，类：<code>Imi\Db\Annotation\Transaction</code></p><p>这个注解可以加在任意方法上，在方法调用前开启事务，在方法中抛出异常时回滚事务，方法成功返回时提交事务。</p><p><code>@Transaction</code></p><p><code>@Transaction(autoCommit=&quot;自动提交事务true/false，默认为true&quot;)</code></p><p>例：</p><pre><code class="php">use Imi\Db\Annotation\Transaction;
+
+/**
+ * @Transaction
+ */
+public function create()
+{
+    // 你的代码，抛异常就回滚，没异常就提交
+}</code></pre><p><strong>事务类型：</strong></p><ul><li>如果当前不在事务中则开启事务（默认）</li></ul><p><code>@Transaction(type=TransactionType::AUTO)</code></p><ul><li>事务嵌套</li></ul><p><code>@Transaction(type=TransactionType::NESTING)</code></p><ul><li>该方法必须在事务中被调用</li></ul><p><code>@Transaction(type=TransactionType::REQUIREMENT)</code></p><p><strong>部分回滚：</strong></p><p><code>@Transaction(rollbackType=RollbackType::PART, rollbackLevels=&quot;回滚层数，默认为1&quot;)</code></p><p><strong>事务监听：</strong></p><p>监听提交事务：</p><pre><code class="php">$db = Db::getInstance();
+$db-&gt;getTransaction()-&gt;onTransactionCommit(function($param){
+    $data = $param-&gt;getData();
+    $db = $data[&#039;db&#039;];
+    $level = $data[&#039;level&#039;]; // 第几层事务，支持事务嵌套
+});</code></pre><p>监听回滚事务：</p><pre><code class="php">$db = Db::getInstance();
+$db-&gt;getTransaction()-&gt;onTransactionRollback(function($param){
+    $data = $param-&gt;getData();
+    $db = $data[&#039;db&#039;];
+    $level = $data[&#039;level&#039;]; // 第几层事务，支持事务嵌套
+});</code></pre><h3 id="指定表 (table/from)"><a href="#指定表 (table/from)">指定表 (table/from)</a></h3><pre><code class="php">// 指定表名
+Db::query()-&gt;table(&#039;tb_test&#039;);
+// 指定表名并且设置别名
+Db::query()-&gt;table(&#039;tb_test&#039;, &#039;test&#039;);
+// 指定表名和数据库名
+Db::query()-&gt;table(&#039;tb_test&#039;, null, &#039;db1&#039;);
+// 传入参数原样代入到SQL中
+Db::query()-&gt;tableRaw(&#039;tb_test&#039;);
+
+// 如果连接配置设置了表前缀：tb_
+Db::query()-&gt;table(&#039;test&#039;)-&gt;select(); // select * from tb_test
+
+// 设置表前缀
+Db::query()-&gt;tablePrefix(&#039;&#039;)-&gt;table(&#039;test&#039;)-&gt;select(); // select * from test</code></pre><blockquote><code>table()</code> 和 <code>tableRaw()</code> 也可以使用 <code>from()</code> 和 <code>fromRaw()</code> 代替。</blockquote><h3 id="指定分区"><a href="#指定分区">指定分区</a></h3><pre><code class="php">Db::query()-&gt;partition([&#039;a&#039;, &#039;b&#039;]); // 传数组
+Db::query()-&gt;partitionRaw(&#039;`a`,`b`&#039;); // 传 sql</code></pre><blockquote>支持 MySQL 下的增删改查操作</blockquote><h3 id="distinct"><a href="#distinct">distinct</a></h3><pre><code class="php">// 结果唯一
+Db::query()-&gt;distinct();
+// 结果不唯一
+Db::query()-&gt;distinct(false);</code></pre><h3 id="指定字段 (field)"><a href="#指定字段 (field)">指定字段 (field)</a></h3><pre><code class="php">// 指定一个字段
+Db::query()-&gt;field(&#039;id&#039;);
+
+// 指定多个字段，也支持设置别名。空格和as都支持
+Db::query()-&gt;field(&#039;id&#039;, &#039;name1 name&#039;, &#039;age1 as age&#039;);
+
+// 和上面的用法等同
+Db::query()-&gt;field([&#039;id&#039;, &#039;name1 name&#039;, &#039;age1 as age&#039;]);
+
+// 传入参数原样代入到SQL中
+Db::query()-&gt;fieldRaw(&#039;id, name1 name, age1 as age&#039;);
+
+// 传入参数原样代入到SQL中，也支持参数绑定（不支持同时使用 ? 和 :xxx）
+Db::query()-&gt;fieldRaw(&#039;id, name1 name, age1 as age, ? as value&#039;, null, [123]);
+Db::query()-&gt;fieldRaw(&#039;id, name1 name, age1 as age, :value as value&#039;, null, [&#039;:value&#039; =&gt; 123]);</code></pre><h3 id="条件 where"><a href="#条件 where">条件 where</a></h3><h4 id="where"><a href="#where">where</a></h4><pre><code class="php">// id = 1
+Db::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1);
+
+// id &gt; 1
+Db::query()-&gt;where(&#039;id&#039;, &#039;&gt;&#039;, 1);
+
+// 使用 Raw 原样代入值，例：value = 1 + 2
+Db::query()-&gt;where(&#039;value&#039;, &#039;=&#039;, new \Imi\Db\Query\Raw(&#039;1 + 2&#039;));
+
+// title like &#039;%test%&#039;
+Db::query()-&gt;where(&#039;title&#039;, &#039;like&#039;, &#039;%test%&#039;);
+
+// id between 1 and 10
+Db::query()-&gt;where(&#039;id&#039;, &#039;between&#039;, [1, 10]);
+
+// id not between 1 and 10
+Db::query()-&gt;where(&#039;id&#039;, &#039;not between&#039;, [1, 10]);
+
+// or id = 1
+Db::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1, &#039;or&#039;);
+Db::query()-&gt;orWhere(&#039;id&#039;, &#039;=&#039;, 1);
+
+// JSON 类型字段条件
+Db::query()-&gt;where(&#039;field1-&gt;uid&#039;, &#039;=&#039;, 1);</code></pre><h4 id="TP 风格 where"><a href="#TP 风格 where">TP 风格 where</a></h4><pre><code class="php">// select * from `tb_test` where (`id` = 1 or (`id` = 2 ) and `title` like &#039;%test%&#039; and `age` &gt; 18 and (`id` = 2 or (`id` = 3 ) ) )
+Db::query()-&gt;from(&#039;tb_test&#039;)-&gt;whereEx([
+    &#039;id&#039;    =&gt;  1,
+    &#039;or&#039;    =&gt;  [
+        &#039;id&#039;    =&gt;  2,
+    ],
+    &#039;title&#039; =&gt;  [&#039;like&#039;, &#039;%test%&#039;],
+    &#039;age&#039;   =&gt;  [&#039;&gt;&#039;, 18],
+    &#039;and&#039;   =&gt;  [
+        &#039;id&#039;    =&gt;  2,
+        &#039;or&#039;    =&gt;  [
+            &#039;id&#039;    =&gt;  3,
+        ]
+    ]
+]);</code></pre><h4 id="whereRaw"><a href="#whereRaw">whereRaw</a></h4><pre><code class="php">// 传入参数原样代入到SQL中
+Db::query()-&gt;whereRaw(&#039;id &gt;= 1&#039;);
+// 传入参数原样代入到SQL中，并且为or条件
+Db::query()-&gt;whereRaw(&#039;id &gt;= 1&#039;, &#039;or&#039;);
+Db::query()-&gt;orWhereRaw(&#039;id &gt;= 1&#039;);
+
+// 支持参数绑定（不支持同时使用 ? 和 :xxx）
+// 传入参数原样代入到SQL中，并且为or条件
+Db::query()-&gt;whereRaw(&#039;id &gt;= ?&#039;, &#039;or&#039;, [1]);
+Db::query()-&gt;orWhereRaw(&#039;id &gt;= ?&#039;, [1]);
+Db::query()-&gt;whereRaw(&#039;id &gt;= :value&#039;, &#039;or&#039;, [&#039;:value&#039; =&gt; 1]);
+Db::query()-&gt;orWhereRaw(&#039;id &gt;= :value&#039;, [&#039;:value&#039; =&gt; 1]);</code></pre><h4 id="whereBrackets"><a href="#whereBrackets">whereBrackets</a></h4><pre><code class="php">// where id = 1 or (age &lt; 14)
+Db::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;whereBrackets(function(){
+    // 直接返回字符串
+    return &#039;age &lt; 14&#039;;
+}, &#039;or&#039;);
+// 支持使用 sql 语句: where id = 1 or (age &gt; 10 and age &lt; 14)
+Db::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;whereBrackets(function(){
+    // 直接返回字符串
+    return [
+        \Imi\Db\Query\Where\Where::raw(&#039;age &gt; 10&#039;),
+        new \Imi\Db\Query\Where\Where(&#039;age&#039;, &#039;&lt;&#039;, 14),
+    ];
+}, &#039;or&#039;);
+// where id = 1 or (age &lt; 14)
+Db::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;whereBrackets(function(){
+    // 直接返回字符串
+    return new \Imi\Db\Query\Where\Where(&#039;age&#039;, &#039;&lt;&#039;, 14);
+}, &#039;or&#039;);
+Db::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;orWhereBrackets(function(){
+    // 直接返回字符串
+    return new \Imi\Db\Query\Where\Where(&#039;age&#039;, &#039;&lt;&#039;, 14);
+});</code></pre><h4 id="whereStruct"><a href="#whereStruct">whereStruct</a></h4><pre><code class="php">// or age &lt; 14
+Db::query()-&gt;whereStruct(new \Imi\Db\Query\Where\Where(&#039;age&#039;, &#039;&lt;&#039;, 14), &#039;or&#039;);
+Db::query()-&gt;orWhereStruct(new \Imi\Db\Query\Where\Where(&#039;age&#039;, &#039;&lt;&#039;, 14));</code></pre><h4 id="其它"><a href="#其它">其它</a></h4><pre><code class="php">// or age between 1 and 14
+Db::query()-&gt;whereBetween(&#039;age&#039;, 1, 14, &#039;or&#039;);
+Db::query()-&gt;orWhereBetween(&#039;age&#039;, 1, 14);
+
+// or age not between 1 and 14
+Db::query()-&gt;whereNotBetween(&#039;age&#039;, 1, 14, &#039;or&#039;);
+Db::query()-&gt;orWhereNotBetween(&#039;age&#039;, 1, 14);
+
+// or age in (1,2,3)
+Db::query()-&gt;whereIn(&#039;age&#039;, [1, 2, 3], &#039;or&#039;);
+Db::query()-&gt;orWhereIn(&#039;age&#039;, [1, 2, 3]);
+
+// or age not in (1,2,3)
+Db::query()-&gt;whereNotIn(&#039;age&#039;, [1, 2, 3], &#039;or&#039;);
+Db::query()-&gt;orWhereNotIn(&#039;age&#039;, [1, 2, 3]);
+
+// or age is null
+Db::query()-&gt;whereIsNull(&#039;age&#039;, &#039;or&#039;);
+Db::query()-&gt;orWhereIsNull(&#039;age&#039;);
+
+// or age is not null
+Db::query()-&gt;whereIsNotNull(&#039;age&#039;, &#039;or&#039;);
+Db::query()-&gt;orWhereIsNotNull(&#039;age&#039;);</code></pre><h4 id="JSON 字段支持"><a href="#JSON 字段支持">JSON 字段支持</a></h4><p>看如下代码，<code>data</code>为<code>json</code>类型字段，查询<code>json</code>对象中的<code>member.age</code>为<code>11</code>的记录</p><pre><code class="php">Db::query()-&gt;where(&#039;data-&gt;member.age&#039;, &#039;=&#039;, 11)-&gt;select();</code></pre><h3 id="join"><a href="#join">join</a></h3><pre><code class="php">// select * from tb_test1 left join tb_test2 on tb_test1.aid = tb_test2.bid
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;join(&#039;tb_test2&#039;, &#039;tb_test1.aid&#039;, &#039;=&#039;, &#039;tb_test2.bid&#039;);
+// select * from tb_test1 left join tb_test2 as test2 on tb_test1.aid = test2.bid
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;join(&#039;tb_test2&#039;, &#039;tb_test1.aid&#039;, &#039;=&#039;, &#039;test2.bid&#039;, &#039;test&#039;);
+// select * from tb_test1 right join tb_test2 on tb_test1.aid = tb_test2.bid and tb_test1.age &gt; 14
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;join(&#039;tb_test2&#039;, &#039;tb_test1.aid&#039;, &#039;=&#039;, &#039;tb_test2.bid&#039;, null, new \Imi\Db\Query\Where\Where(&#039;tb_test1.age&#039;, &#039;&gt;&#039;, &#039;14&#039;), &#039;right&#039;);
+
+// select * from tb_test1 left join tb_test2 on tb_test1.aid = tb_test2.bid
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;joinRaw(&#039;left join tb_test2 on tb_test1.aid = tb_test2.bid&#039;);
+
+// 支持参数绑定（不支持同时使用 ? 和 :xxx）
+// select * from tb_test1 left join tb_test2 on tb_test1.aid = tb_test2.bid and tb_test2.xxx = ?
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;joinRaw(&#039;left join tb_test2 on tb_test1.aid = tb_test2.bid and tb_test2.xxx = ?&#039;, [123]);
+// select * from tb_test1 left join tb_test2 on tb_test1.aid = tb_test2.bid and tb_test2.xxx = :value
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;joinRaw(&#039;left join tb_test2 on tb_test1.aid = tb_test2.bid and tb_test2.xxx = :value&#039;, [&#039;:value&#039; =&gt; 123]);
+
+// 下面三种用法，第5个参数都支持传Where
+// left join
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;leftJoin(&#039;tb_test2&#039;, &#039;tb_test1.aid&#039;, &#039;=&#039;, &#039;tb_test2.bid&#039;);
+// right join
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;rightJoin(&#039;tb_test2&#039;, &#039;tb_test1.aid&#039;, &#039;=&#039;, &#039;tb_test2.bid&#039;);
+// cross join
+Db::query()-&gt;table(&#039;tb_test1&#039;)-&gt;crossJoin(&#039;tb_test2&#039;, &#039;tb_test1.aid&#039;, &#039;=&#039;, &#039;tb_test2.bid&#039;);</code></pre><h3 id="order"><a href="#order">order</a></h3><pre><code class="php">// order by id asc, age desc
+Db::query()-&gt;order(&#039;id&#039;)-&gt;order(&#039;age&#039;, &#039;desc&#039;);
+
+// order by id desc
+Db::query()-&gt;orderRaw(&#039;id desc&#039;);
+
+// order by id desc, 1 asc
+Db::query()-&gt;orderRaw(&#039;id desc, ? asc&#039;, [1]);
+
+// order by id desc, 1 asc
+Db::query()-&gt;orderRaw(&#039;id desc, :value asc&#039;, [&#039;:value&#039; =&gt; 1]);
+
+// JSON 类型参数排序
+Db::query()-&gt;order(&#039;field1-&gt;uid&#039;, &#039;desc&#039;);</code></pre><h3 id="group by"><a href="#group by">group by</a></h3><pre><code class="php">// group by id, name
+Db::query()-&gt;group(&#039;id&#039;, &#039;name&#039;);
+
+// group by sum(id)
+Db::query()-&gt;groupRaw(&#039;sum(id)&#039;);
+
+// group by sum(id), ?
+Db::query()-&gt;groupRaw(&#039;sum(id), ?&#039;, [123]);
+
+// group by sum(id), :value
+Db::query()-&gt;groupRaw(&#039;sum(id), :value&#039;, [&#039;:value&#039; =&gt; 123]);</code></pre><h3 id="having"><a href="#having">having</a></h3><p><code>having()</code>用法同<code>where()</code></p><p><code>havingRaw()</code>用法同<code>whereRaw()</code></p><p><code>havingBrackets()</code>用法同<code>whereBrackets()</code></p><p><code>havingStruct()</code>用法同<code>whereStruct()</code></p><h3 id="分页查询"><a href="#分页查询">分页查询</a></h3><pre><code class="php">// limit 900, 100
+Db::query()-&gt;page(10, 100);
+
+// limit 10, 1
+Db::query()-&gt;offset(10)-&gt;limit(1);
+
+// limit 1
+Db::query()-&gt;limit(1);</code></pre><h3 id="分页查询带扩展字段"><a href="#分页查询带扩展字段">分页查询带扩展字段</a></h3><p><strong>查询总记录数、总页数：</strong></p><pre><code class="php">$page = 1;
+$count = 10;
+$data = Db::query()-&gt;from(&#039;xxxtable&#039;)-&gt;paginate($page, $count);
+// 指定转数组后的字段名
+$data = TDb::query()-&gt;from(&#039;xxxtable&#039;)-&gt;paginate($page, $count, [
+    &#039;field_list&#039; =&gt; &#039;list&#039;,
+    &#039;field_limit&#039; =&gt; &#039;limit&#039;,
+    &#039;field_total&#039; =&gt; &#039;total&#039;,
+    &#039;field_page_count&#039; =&gt; &#039;page_count&#039;,
+]);
+
+$data-&gt;getList(); // 列表数据
+$data-&gt;getTotal(); // 总记录数
+$data-&gt;getLimit(); // $count === 10
+$data-&gt;getPageCount(); // 总页数
+
+var_dump($data-&gt;toArray()); // 转数组
+var_dump(json_encode($data)); // 支持序列化
+// 数据格式如下：
+[
+    &#039;list&#039;          =&gt; [],
+    &#039;total&#039;         =&gt; 100,
+    &#039;limit&#039;         =&gt; 10,
+    &#039;page_count&#039;    =&gt; 10,
+]</code></pre><p><strong>不查询总记录数、总页数：</strong></p><pre><code class="php">$page = 1;
+$count = 10;
+$data = Db::query()-&gt;from(&#039;xxxtable&#039;)-&gt;paginate($page, $count, [
+    &#039;total&#039; =&gt;  false,
+]);
+var_dump($data-&gt;toArray()); // 转数组
+var_dump(json_encode($data)); // 支持序列化
+// 数据格式如下：
+[
+    &#039;list&#039;          =&gt; [],
+    &#039;limit&#039;         =&gt; 10,
+]</code></pre><p><strong>全局设置转数组后的字段名：</strong></p><p>配置<code>@app.db.paginate.fields</code>:</p><pre><code class="php">[
+    &#039;list&#039; =&gt; &#039;list&#039;,
+    &#039;limit&#039; =&gt; &#039;limit&#039;,
+    &#039;total&#039; =&gt; &#039;total&#039;,
+    &#039;pageCount&#039; =&gt; &#039;page_count&#039;,
+]</code></pre><h2 id="查询执行"><a href="#查询执行">查询执行</a></h2><h3 id="查询记录"><a href="#查询记录">查询记录</a></h3><h4 id="查询单行"><a href="#查询单行">查询单行</a></h4><pre><code class="php">$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;select();
+$result-&gt;get(); // 数组
+$result-&gt;get($className); // $className对应的类对象</code></pre><h4 id="查询多行"><a href="#查询多行">查询多行</a></h4><pre><code class="php">$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;select();
+$result-&gt;getArray(); // 数组内嵌套数组
+$result-&gt;getArray($className); // 数组内嵌套$className对应的类对象
+$result-&gt;getRowCount(); // 获取查询出的记录行数</code></pre><h4 id="查询一行"><a href="#查询一行">查询一行</a></h4><pre><code class="php">Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;find();
+
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;find($className); // $className 默认null，可以不填，用途参考数据集 get 方法</code></pre><h4 id="查询单个值"><a href="#查询单个值">查询单个值</a></h4><pre><code class="php">Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;value(&#039;username&#039;);
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;value(&#039;username&#039;, -1); // 当数据查询不到时返回的默认值 -1</code></pre><h4 id="查询指定列"><a href="#查询指定列">查询指定列</a></h4><pre><code class="php">// 查询 username 列并作为数组返回
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;column(&#039;username&#039;);
+// 结果值如下：
+[
+    &#039;username1&#039;,
+    &#039;username2&#039;,
+    &#039;username4&#039;,
+]
+
+// 查询 username 列并返回 id 做下标，username 作为值的数组
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;column(&#039;username&#039;, &#039;id&#039;);
+// 结果值如下：
+[
+    1 =&gt; &#039;username1&#039;,
+    2 =&gt; &#039;username2&#039;,
+    3 =&gt; &#039;username4&#039;,
+]
+
+// 查询 username、password 列并返回 id 做下标的数组
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;column([&#039;username&#039;, &#039;password&#039;], &#039;id&#039;);
+// 结果值如下：
+[
+    1 =&gt; [&#039;username&#039; =&gt; &#039;username1&#039;, &#039;password&#039; =&gt; &#039;123&#039;],
+    2 =&gt; [&#039;username&#039; =&gt; &#039;username2&#039;, &#039;password&#039; =&gt; &#039;456&#039;],
+    3 =&gt; [&#039;username&#039; =&gt; &#039;username3&#039;, &#039;password&#039; =&gt; &#039;789&#039;],
+]</code></pre><h4 id="构建查询语句"><a href="#构建查询语句">构建查询语句</a></h4><p>构建语句，但不执行</p><pre><code class="php">$query = Db::query()-&gt;table(&#039;tb_test&#039;);
+$sql = $query-&gt;buildSelectSql(); // 构建 SQL
+$binds = $query-&gt;getBinds(); // 获取预处理绑定的值</code></pre><blockquote>注意不要重复构建，同一个对象在执行 <code>execute()</code> 前只能构建一次</blockquote><h4 id="分块查询"><a href="#分块查询">分块查询</a></h4><h5 id="chunkById"><a href="#chunkById">chunkById</a></h5><p>利用有序字段进行分段读取，返回符合条件的数据，对于大型数据集结果，可以有效缓解数据库压力，降低应用内存消耗，提升稳定性。</p><table><thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>limit</td><td>int</td><td>每次查询的块大小</td></tr><tr><td>column</td><td>string</td><td>用于分块的有序字段，建议是有序且存在索引的数值字段，一般情况下可以利用主键</td></tr><tr><td>alias</td><td>string</td><td>用于分块的有序字段的别名，一般情况下跟<code>column</code>是一致的，无须设置，如果定义字段查询结果的别名时可设置该参数</td></tr><tr><td>orderBy</td><td>string</td><td>用于分块的有序字段排序方式指定，支持<code>asc</code>、<code>desc</code>，默认为<code>asc</code></td></tr></tbody></table><blockquote>用于查询的字段的值必须是唯一且递增的。<br>该查询方法是不支持用户设置排序的，任何类型的排序都将被重置，仅能通过<code>column</code>指定一个字段的排序方式。<br>对于<code>ORM</code>下使用，由于不是一次性载入全部数据，预加载功能对于每个块都是重复加载的，建议根据实际情况决定是否实现一个缓存查询来替代预加载。</blockquote><pre><code class="php">// 按 10 条每块遍历全部符合条件的行。
+
+foreach (Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;chunkById(10, &#039;id&#039;) as $result)
+{
+    $list = $result-&gt;getArray(); // select 结果集
+    // 遍历结果集
+    foreach ($list as $row)
+    {
+        var_dump($row);
+    }
+}
+
+// 还有一个更简单的用法
+
+foreach (Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;chunkById(10, &#039;id&#039;)-&gt;each() as $row)
+{
+    var_dump($row);
+}</code></pre><h5 id="chunkByOffset"><a href="#chunkByOffset">chunkByOffset</a></h5><p>利用<code>limit</code>进行查询驱动分块，效率与一般分页查询没区别，相对<code>chunkById</code>兼容更多的场景，如果追求性能还是推荐<code>chunkById</code>。</p><table><thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>limit</td><td>int</td><td>每次查询的块大小</td></tr></tbody></table><blockquote>对于<code>ORM</code>下使用，由于不是一次性载入全部数据，预加载功能对于每个块都是重复加载的，建议根据实际情况决定是否实现一个缓存查询来替代预加载。</blockquote><pre><code class="php">// 按 10 条每块遍历全部符合条件的行。
+
+foreach (Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;chunkByOffset(10) as $result)
+{
+    $list = $result-&gt;getArray(); // select 结果集
+    // 遍历结果集
+    foreach ($list as $row)
+    {
+        var_dump($row);
+    }
+}
+
+// 还有一个更简单的用法
+
+foreach (Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;chunkByOffset(10)-&gt;each() as $row)
+{
+    var_dump($row);
+}</code></pre><h5 id="chunkEach"><a href="#chunkEach">chunkEach</a></h5><blockquote>该方法已弃用并计划<code>3.0</code>移除，请使用<code>chunkById()-&gt;each()</code>or<code>chunkByOffset()-&gt;each()</code>替代。</blockquote><h4 id="游标查询"><a href="#游标查询">游标查询</a></h4><p>游标查询能对于查询大结果集时能有效节约应用内存消耗，对于数据库的消耗与<code>select</code>无差别。<br>对于<code>ORM</code>下使用，由于不是一次性载入全部数据，与预加载功能不兼容，不推荐对于游标查询进行任何的模型关联操作。</p><pre><code class="php">foreach (Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;cursor() as $data)
+{
+    var_dump($data); // 输出单条查询结果
+}</code></pre><h4 id="聚合函数"><a href="#聚合函数">聚合函数</a></h4><pre><code class="php">// count(*)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;count();
+
+// count(id)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;count(&#039;id&#039;);
+
+// sum(id)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;sum(&#039;id&#039;);
+
+// avg(id)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;avg(&#039;id&#039;);
+
+// max(id)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;max(&#039;id&#039;);
+
+// min(id)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;min(&#039;id&#039;);
+
+// 其它自定义：test(id)
+Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;aggregate(&#039;test&#039;, &#039;id&#039;);</code></pre><h3 id="插入记录"><a href="#插入记录">插入记录</a></h3><pre><code class="php">// insert into tb_test(name, age) values(&#039;yurun&#039;, 666)
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;insert([
+    &#039;name&#039;  =&gt;    &#039;yurun&#039;,
+    &#039;age&#039;    =&gt;    666,
+]);
+
+// insert into tb_test values(&#039;yurun&#039;, 666)
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;insert([
+    &#039;yurun&#039;,666,
+]);
+
+// 忽略已存在记录，仅支持 MySQL
+// insert ignore into tb_test values(&#039;yurun&#039;, 666)
+$query = Db::query();
+$query-&gt;getOption()-&gt;options[&#039;ignore&#039;] = true;
+$result = $query-&gt;table(&#039;tb_test&#039;)-&gt;insert([
+    &#039;yurun&#039;,666,
+]);
+
+$result-&gt;isSuccess(); // SQL是否执行成功
+$result-&gt;getLastInsertId(); // 获取最后插入的ID
+$result-&gt;getAffectedRows(); // 获取影响行数</code></pre><h4 id="构建插入语句"><a href="#构建插入语句">构建插入语句</a></h4><p>构建语句，但不执行</p><pre><code class="php">$query = Db::query()-&gt;table(&#039;tb_test&#039;);
+$sql = $query-&gt;buildInsertSql([
+    &#039;name&#039;  =&gt;    &#039;yurun&#039;,
+    &#039;age&#039;    =&gt;    666,
+]); // 构建 SQL
+$binds = $query-&gt;getBinds(); // 获取预处理绑定的值</code></pre><blockquote>注意不要重复构建，同一个对象在执行 <code>execute()</code> 前只能构建一次</blockquote><h3 id="批量插入"><a href="#批量插入">批量插入</a></h3><pre><code class="php">$result = Db::query()-&gt;from(&#039;test&#039;)-&gt;batchInsert([
+    [&#039;name&#039;=&gt;&#039;a&#039;],
+    [&#039;name&#039;=&gt;&#039;b&#039;],
+    [&#039;name&#039;=&gt;&#039;c&#039;],
+]);
+
+// 忽略已存在记录，仅支持 MySQL
+$query = Db::query();
+$query-&gt;getOption()-&gt;options[&#039;ignore&#039;] = true;
+$result = $query-&gt;from(&#039;test&#039;)-&gt;batchInsert([
+    [&#039;name&#039;=&gt;&#039;a&#039;],
+    [&#039;name&#039;=&gt;&#039;b&#039;],
+    [&#039;name&#039;=&gt;&#039;c&#039;],
+]);
+
+$result-&gt;isSuccess(); // SQL是否执行成功
+$result-&gt;getAffectedRows(); // 获取影响行数</code></pre><h4 id="构建批量插入语句"><a href="#构建批量插入语句">构建批量插入语句</a></h4><p>构建语句，但不执行</p><pre><code class="php">$query = Db::query()-&gt;table(&#039;tb_test&#039;);
+$sql = $query-&gt;buildBatchInsertSql([
+    [&#039;name&#039;=&gt;&#039;a&#039;],
+    [&#039;name&#039;=&gt;&#039;b&#039;],
+    [&#039;name&#039;=&gt;&#039;c&#039;],
+]); // 构建 SQL
+$binds = $query-&gt;getBinds(); // 获取预处理绑定的值</code></pre><blockquote>注意不要重复构建，同一个对象在执行 <code>execute()</code> 前只能构建一次</blockquote><h3 id="更新记录"><a href="#更新记录">更新记录</a></h3><pre><code class="php">// update tb_test set name = &#039;yurun&#039;, age = 666 where id = 1
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;update([
+    &#039;name&#039;    =&gt;    &#039;yurun&#039;,
+    &#039;age&#039;    =&gt;    666,
+    // JSON 类型参数
+    &#039;field1-&gt;name&#039;        =&gt; &#039;bbb&#039;, // 修改 name
+    &#039;field1-&gt;list2&#039;       =&gt; [1, 2, 3], // 修改 list2，支持数组、对象
+    &#039;field1-&gt;list1[0].id&#039; =&gt; &#039;2&#039;, // 支持对数组中指定成员、对象属性赋值，支持无限级
+]);
+
+// $result使用方法同上</code></pre><h4 id="构建更新语句"><a href="#构建更新语句">构建更新语句</a></h4><p>构建语句，但不执行</p><pre><code class="php">$query = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1);
+$sql = $query-&gt;buildUpdateSql([
+    &#039;name&#039;    =&gt;    &#039;yurun&#039;,
+    &#039;age&#039;    =&gt;    666,
+    // JSON 类型参数
+    &#039;field1-&gt;name&#039;        =&gt; &#039;bbb&#039;, // 修改 name
+    &#039;field1-&gt;list2&#039;       =&gt; [1, 2, 3], // 修改 list2，支持数组、对象
+    &#039;field1-&gt;list1[0].id&#039; =&gt; &#039;2&#039;, // 支持对数组中指定成员、对象属性赋值，支持无限级
+]); // 构建 SQL
+$binds = $query-&gt;getBinds(); // 获取预处理绑定的值</code></pre><blockquote>注意不要重复构建，同一个对象在执行 <code>execute()</code> 前只能构建一次</blockquote><h3 id="替换数据"><a href="#替换数据">替换数据</a></h3><pre><code class="php">// replace into tb_test set id = 1, name = &#039;yurun&#039;, age = 666
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;replace([
+    &#039;id&#039;    =&gt;    1,
+    &#039;name&#039;    =&gt;    &#039;yurun&#039;,
+    &#039;age&#039;    =&gt;    666,
+]);</code></pre><h4 id="构建替换语句"><a href="#构建替换语句">构建替换语句</a></h4><p>构建语句，但不执行</p><pre><code class="php">$query = Db::query()-&gt;table(&#039;tb_test&#039;);
+$sql = $query-&gt;buildReplaceSql([
+    &#039;id&#039;    =&gt;    1,
+    &#039;name&#039;    =&gt;    &#039;yurun&#039;,
+    &#039;age&#039;    =&gt;    666,
+]); // 构建 SQL
+$binds = $query-&gt;getBinds(); // 获取预处理绑定的值</code></pre><blockquote>注意不要重复构建，同一个对象在执行 <code>execute()</code> 前只能构建一次</blockquote><h3 id="递增/递减"><a href="#递增/递减">递增/递减</a></h3><pre><code class="php">// score 递增 1
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)
+                     -&gt;where(&#039;id&#039;, &#039;=&#039;, 1)
+                     -&gt;setFieldInc(&#039;score&#039;)
+                     -&gt;update();
+
+// score 递增 10
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)
+                     -&gt;where(&#039;id&#039;, &#039;=&#039;, 1)
+                     -&gt;setFieldInc(&#039;score&#039;, 10)
+                     -&gt;update();
+
+// score 递减 1
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)
+                     -&gt;where(&#039;id&#039;, &#039;=&#039;, 1)
+                     -&gt;setFieldDec(&#039;score&#039;)
+                     -&gt;update();
+
+// score 递减 10
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)
+                     -&gt;where(&#039;id&#039;, &#039;=&#039;, 1)
+                     -&gt;setFieldDec(&#039;score&#039;, 10)
+                     -&gt;update();</code></pre><h3 id="update/insert/replace时使用表达式"><a href="#update/insert/replace时使用表达式">update/insert/replace时使用表达式</a></h3><pre><code class="php">// update tb_test set score = score + 1 where id = 1
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)
+                     -&gt;where(&#039;id&#039;, &#039;=&#039;, 1)
+                     -&gt;setFieldExp(&#039;score&#039;, &#039;score + ?&#039;, [1])
+                     -&gt;update();</code></pre><h3 id="删除记录"><a href="#删除记录">删除记录</a></h3><pre><code class="php">// delete from tb_test where id = 1
+$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;delete();
+
+// $result使用方法同上</code></pre><h4 id="构建删除语句"><a href="#构建删除语句">构建删除语句</a></h4><p>构建语句，但不执行</p><pre><code class="php">$query = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1);
+$sql = $query-&gt;buildDeleteSql(); // 构建 SQL
+$binds = $query-&gt;getBinds(); // 获取预处理绑定的值</code></pre><blockquote>注意不要重复构建，同一个对象在执行 <code>execute()</code> 前只能构建一次</blockquote><h3 id="加锁"><a href="#加锁">加锁</a></h3><p>排它锁：</p><pre><code class="php">use Imi\Db\Mysql\Query\Lock\MysqlLock;
+Db::query()-&gt;from(&#039;tb_xxx&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;lock(MysqlLock::FOR_UPDATE)-&gt;select()-&gt;get();</code></pre><p>共享锁：</p><pre><code class="php">use Imi\Db\Mysql\Query\Lock\MysqlLock;
+Db::query()-&gt;from(&#039;tb_xxx&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;lock(MysqlLock::SHARED)-&gt;select()-&gt;get();</code></pre><h2 id="直接执行SQL"><a href="#直接执行SQL">直接执行SQL</a></h2><pre><code class="php">$result = Db::query()-&gt;execute(&#039;select * from tb_test&#039;));
+
+// $result使用方法同上</code></pre><h2 id="参数绑定"><a href="#参数绑定">参数绑定</a></h2><p>复杂的查询时，难免需要拼接 SQL，这时候就需要参数绑定来防止注入了！</p><pre><code class="php">// where id = 123
+$result = Db::query()-&gt;whereRaw(&#039;id = ?&#039;)-&gt;bindValue(1, 123);
+$result = Db::query()-&gt;whereRaw(&#039;id = :val&#039;)-&gt;bindValue(&#039;:val&#039;, 123);
+
+// 批量绑定
+$result = Db::query()-&gt;bindValues([
+    &#039;:name&#039;    =&gt;    &#039;yurun&#039;,
+    &#039;:age&#039;    =&gt;    666,
+])-&gt;execute(&#039;select * from tb_test where name = :name and age = :age&#039;);</code></pre><h2 id="设置/获取 Result 结果集类名"><a href="#设置/获取 Result 结果集类名">设置/获取 Result 结果集类名</a></h2><pre><code class="php">$query = Db::query();
+// 获取
+var_dump($query-&gt;getResultClass());
+
+// 设置
+$query-&gt;setResultClass(\Imi\Db\Query\Result::class);</code></pre><h2 id="Result 用法"><a href="#Result 用法">Result 用法</a></h2><pre><code class="php">$result = Db::query()-&gt;table(&#039;tb_test&#039;)-&gt;select();</code></pre><h3 id="是否执行成功"><a href="#是否执行成功">是否执行成功</a></h3><pre><code class="php">$success = $result-&gt;isSuccess(); // true/false</code></pre><h3 id="获取最后插入的ID"><a href="#获取最后插入的ID">获取最后插入的ID</a></h3><p>用于获取新增记录的自增字段值</p><pre><code class="php">$lastInsertId = $result-&gt;getLastInsertId(); // int</code></pre><h3 id="获取影响行数"><a href="#获取影响行数">获取影响行数</a></h3><pre><code class="php">$rows = $result-&gt;getAffectedRows();</code></pre><blockquote>update 时，如果没有值被改变，可能会返回0</blockquote><h3 id="返回一行数据"><a href="#返回一行数据">返回一行数据</a></h3><h4 id="返回数组"><a href="#返回数组">返回数组</a></h4><pre><code class="php">$dataArray = $result-&gt;get();</code></pre><h4 id="返回对象"><a href="#返回对象">返回对象</a></h4><p>实例化这个类时，把数组传入构造方法</p><pre><code class="php">$dataArray = $result-&gt;get(XXXModel::class);</code></pre><h3 id="返回数组列表"><a href="#返回数组列表">返回数组列表</a></h3><h4 id="成员为数组"><a href="#成员为数组">成员为数组</a></h4><pre><code class="php">$list = $result-&gt;getArray();</code></pre><h4 id="成员为对象"><a href="#成员为对象">成员为对象</a></h4><pre><code class="php">$list = $result-&gt;getArray(XXXModel::class);</code></pre><h3 id="获取一列"><a href="#获取一列">获取一列</a></h3><pre><code class="php">$ids = Db::query()-&gt;field(&#039;id&#039;)-&gt;select()-&gt;getColumn();
+// 结果格式：[1, 2, 3]</code></pre><h3 id="获取标量结果"><a href="#获取标量结果">获取标量结果</a></h3><pre><code class="php">$name = Db::query()-&gt;field(&#039;name&#039;)-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;select()-&gt;getScalar();</code></pre><h3 id="获取记录行数"><a href="#获取记录行数">获取记录行数</a></h3><p>得到取回多少条记录</p><pre><code class="php">$rowCount = $result-&gt;getRowCount();</code></pre><h3 id="获取执行的SQL"><a href="#获取执行的SQL">获取执行的SQL</a></h3><pre><code class="php">$sql = $result-&gt;getSql();</code></pre><h3 id="获取结果集"><a href="#获取结果集">获取结果集</a></h3><pre><code class="php">$statement = $result-&gt;getStatement(); // \Imi\Db\Interfaces\IStatement</code></pre><h2 id="渲染预编译SQL语句"><a href="#渲染预编译SQL语句">渲染预编译SQL语句</a></h2><p>主要用于日志或者调试</p><pre><code class="php">$prepare = &quot;select * from `test1` where `id` = :p1 and `text` = :p2 and `a1` in (:p3,:p4,:p5) and `a2` in (0 = 1)&quot;;
+$bindValues = [
+    &#039;:p1&#039; =&gt; -1,
+    &#039;:p2&#039; =&gt; &#039;abc123&#039;,
+    &#039;:p3&#039; =&gt; 1,
+    &#039;:p4&#039; =&gt; 2,
+    &#039;:p5&#039; =&gt; 3,
+];
+
+echo Db::debugSql($prepare, $bindValues);
+// 输出
+// select * from `test1` where `id` = -1 and `text` = &#039;abc123&#039; and `a1` in (1,2,3) and `a2` in (0 = 1)
+
+$prepare = &quot;select * from `test1` where `id` = ? and `text` = ? and `a1` in (?,?) ??&quot;;
+$bindValues = [-1, &#039;abc123&#039;, 1, 2];
+
+echo Db::debugSql($prepare, $bindValues);
+// 输出
+// select * from `test1` where `id` = -1 and `text` = &#039;abc123&#039; and `a1` in (1,2) ??</code></pre>            </div>
+            <div id="mask" style="display:none" onclick="clickMask()"></div>
+        </div>
+    </div>
+
+    <script>
+        $(function(){
+            var leftBarTimeout = null;
+            $('#leftbar').hover(function(e){
+                if(null !== leftBarTimeout)
+                {
+                    clearTimeout(leftBarTimeout);
+                    leftBarTimeout = null;
+                }
+                if(e.type === 'mouseenter')
+                {
+                    $('.left-show-hide').fadeIn(250);
+                }
+                else if($('#leftbar').css('left') == '0px')
+                {
+                    $('.left-show-hide').fadeOut(500);
+                }
+            });
+        });
+        function showLeftbar()
+        {
+            $('#leftbar').css('left', 0);
+            $('#body').css('padding-left','');
+            $('.left-show-hide > i.layui-icon').html('&#xe603;');
+        }
+        function hideLeftbar()
+        {
+            $('#leftbar').css('left', '-240px');
+            $('#body').css('padding-left',0);
+            $('.left-show-hide > i.layui-icon').html('&#xe602;');
+            $('.left-show-hide').fadeIn(250);
+        }
+        $('.left-show-hide').click(function(){
+            if($('#leftbar').css('left') == '0px')
+            {
+                hideLeftbar();
+            }
+            else
+            {
+                showLeftbar();
+            }
+        })
+    </script>
+    <script src="../../statics/js/mddoc-search.js"></script>
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?a84a2a60e03941f661d43d22eeccc5af";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</body>
+</html>
