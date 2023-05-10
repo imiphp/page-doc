@@ -1,0 +1,617 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>数据库表模型 - imi 框架 v2.0 开发手册文档</title>
+    <!-- jQuery-->
+    <script src="../../statics/plugin/jquery/jquery-1.12.0.min.js"></script>
+    <!-- layui -->
+    <link rel="stylesheet" href="../../statics/plugin/layui/css/layui.css" />
+    <script src="../../statics/plugin/layui/layui.all.js"></script>
+    <!-- zTree -->
+    <link rel="stylesheet" href="../../statics/plugin/zTree/css/zTreeStyle/zTreeStyle.css" />
+    <script src="../../statics/plugin/zTree/js/jquery.ztree.core.js"></script>
+    <!-- SyntaxHighlighter -->
+    <script src="../../statics/plugin/SyntaxHighlighter/shCore.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="../../statics/plugin/SyntaxHighlighter/shCoreDefault.css"/>
+    <!-- 自定义 -->
+    <link rel="stylesheet" href="../../statics/css/style.css" />
+    <script src="../../statics/js/home.js"></script>
+    <link rel="stylesheet" href="../../statics/css/docView.css" />
+    <script src="../../statics/js/docView.js"></script>
+</head>
+<body>
+    <!-- top-begin -->
+    <div id="navbar">
+        <div class="bg-blur"></div>
+        <div class="navbar-body">
+            <ul class="layui-nav" lay-filter="">
+                <div class="navRight">
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="/v2.1/" target="_blank" style="padding-right: 40px;">v2.1 <span class="layui-badge">新</span></a>
+                    </li>
+                    <li class="layui-nav-item layui-this" lay-unselect>
+                        <a href="/v2.0/" target="_blank">v2.0</a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="/v1/" target="_blank">v1.x</a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a id="btn-about" href="javascript:;">关于</a>
+                    </li>
+                </div>
+            </ul>
+            <div class="nav-menu">
+                <a href="../../" class="logo"><img src="../../statics/images/logo.png"/></a>
+                <a href="javascript:;" id="navMenuLeft"><i class="layui-icon layui-icon-spread-left"></i></a>
+                <a href="javascript:;" id="navMenuRight"><i class="layui-icon">&#xe61a;</i></a>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <script>
+    function showMask()
+    {
+        $('#mask').show();
+    }
+    function hideMask()
+    {
+        $('#mask').hide();
+    }
+    function clickMask()
+    {
+        closeMenuLeft();
+        closeMenuRight();
+    }
+    function openMenuLeft()
+    {
+        $('#leftbar').addClass('show-item');
+        $('#navMenuLeft').addClass('active');
+        var ico = $('#navMenuLeft .layui-icon');
+        ico.removeClass('layui-icon-spread-left');
+        ico.addClass('layui-icon-shrink-right');
+        showMask();
+    }
+    function closeMenuLeft()
+    {
+        $('#leftbar').removeClass('show-item');
+        $('#navMenuLeft').removeClass('active');
+        var ico = $('#navMenuLeft .layui-icon');
+        ico.removeClass('layui-icon-shrink-right');
+        ico.addClass('layui-icon-spread-left');
+        hideMask();
+    }
+    $('#navMenuLeft').click(function(){
+        var isShow = $('#leftbar').hasClass('show-item');
+        if(isShow)
+        {
+            closeMenuLeft();
+        }
+        else
+        {
+            closeMenuRight();
+            openMenuLeft();
+        }
+    });
+    function openMenuRight()
+    {
+        $('#navbar > .navbar-body > .layui-nav').addClass('show-item')
+        $('#navMenuRight').addClass('active').find('i').html('&#xe619;');
+        showMask();
+    }
+    function closeMenuRight()
+    {
+        $('#navbar > .navbar-body > .layui-nav').removeClass('show-item')
+        $('#navMenuRight').removeClass('active').find('i').html('&#xe61a;');
+        hideMask();
+    }
+    $('#navMenuRight').click(function(){
+        var isShow = $('#navbar > .navbar-body > .layui-nav').hasClass('show-item');
+        if(isShow)
+        {
+            closeMenuRight();
+        }
+        else
+        {
+            closeMenuLeft();
+            openMenuRight();
+        }
+    });
+    </script>
+    <!-- top-end -->
+
+    <!-- left-begin -->
+    <div id="leftbar" class="layui-nav-side">
+        <div class="layui-tab layui-tab-brief" style="margin-top:0">
+            <ul class="layui-tab-title">
+                <li class="layui-this"><i class="layui-icon">&#xe705;</i> 目录</li>
+                <li><i class="layui-icon">&#xe615;</i> 搜索</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <ul id="treeDirectory" class="ztree showIcon"></ul>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="searchBox">
+                        <div id="searchForm">
+                            <div class="inputBox">
+                                <input type="text" id="search-keyword" autocomplete="off" name="keyword" placeholder="搜索关键词" class="layui-input"/>
+                                <i class="layui-icon input-icon">&#xe615;</i>
+                            </div>
+                        </div>
+                        <ul id="treeSearch">
+                        </ul>
+                        <div class="searchResultNone">
+                            <i class="layui-icon">&#xe615;</i>
+                            <p>未搜索到结果</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright noScroll">imiphp</div>
+        </div>
+    </div>
+    <script id="searchListTemplate" type="text/html">
+        {{#  layui.each(d, function(index, item){ }}
+        <li>
+            <a href="{{ item.url }}">
+                <h3>{{ item.searchedTitle }}</h3>
+                <p>{{ item.searchedContent }}</p>
+            </a>
+        </li>
+        {{#  }) }}
+    </script>
+    <!-- left-end -->
+
+    <div id="body">
+        <div id="content_body" name="content_body" style="width:100%;height:100%;border:none;overflow: auto;">
+            <div id="article-content" class="markdown-body">
+                <script>
+                    document.title = '数据库表模型 - imi 框架 v2.0 开发手册文档';
+                    var currentCatalog = {"id":115,"title":"数据库表模型","pageTitle":"数据库表模型","url":"components/orm/RDModel.html"};
+                    var rootPath = location.pathname.substr(0, location.pathname.indexOf(currentCatalog.url));
+                    if('' === rootPath)
+                    {
+                        rootPath = location.pathname;
+                    }
+                    var catalogList = [{"id":1,"parent_id":0,"title":"基础入门","level":0},{"id":2,"parent_id":1,"title":"序言","pageTitle":"序言","mdFileName":"README.md","url":"index.html","level":1},{"id":3,"parent_id":1,"title":"介绍","pageTitle":"介绍","mdFileName":"base/intro.md","url":"base/intro.html","level":1},{"id":4,"parent_id":1,"title":"Swoole 开发环境说明及安装教程","pageTitle":"环境要求","mdFileName":"base/env.md","url":"base/env.html","level":1},{"id":5,"parent_id":1,"title":"开始一个新项目","pageTitle":"开始一个新项目","mdFileName":"base/new.md","url":"base/new.html","level":1},{"id":6,"parent_id":1,"title":"应用配置","pageTitle":"应用配置","mdFileName":"base/config.md","url":"base/config.html","level":1},{"id":7,"parent_id":1,"title":"常见问题","pageTitle":"常见问题","mdFileName":"base/qa.md","url":"base/qa.html","level":1},{"id":8,"parent_id":1,"title":"v1.x-v2.x 不兼容改动","pageTitle":"v1.x-v2.x 不兼容改动","mdFileName":"base/version/1-2.md","url":"base/version/1-2.html","level":1},{"id":9,"parent_id":0,"title":"框架核心","level":0},{"id":10,"parent_id":9,"title":"生命周期","pageTitle":"生命周期","mdFileName":"core/lifeCycle.md","url":"core/lifeCycle.html","level":1},{"id":11,"parent_id":9,"title":"容器","pageTitle":"容器","mdFileName":"core/container.md","url":"core/container.html","level":1},{"id":12,"parent_id":9,"title":"Partial","pageTitle":"Partial","mdFileName":"core/partial.md","url":"core/partial.html","level":1},{"id":13,"parent_id":9,"title":"事件","pageTitle":"事件监听","mdFileName":"components/event/index.md","url":"components/event/index.html","level":1},{"id":14,"parent_id":13,"title":"事件监听","pageTitle":"事件监听","mdFileName":"components/event/index.md","url":"components/event/index.html","level":2},{"id":15,"parent_id":13,"title":"事件列表","pageTitle":"事件列表","mdFileName":"core/events.md","url":"core/events.html","level":2},{"id":16,"parent_id":9,"title":"中间件","pageTitle":"中间件","mdFileName":"core/middleware.md","url":"core/middleware.html","level":1},{"id":17,"parent_id":9,"title":"错误转为异常捕获","pageTitle":"错误转为异常捕获","mdFileName":"core/handleError.md","url":"core/handleError.html","level":1},{"id":18,"parent_id":9,"title":"内部进程间通讯","pageTitle":"内部进程间通讯","mdFileName":"core/processCommunication.md","url":"core/processCommunication.html","level":1},{"id":19,"parent_id":9,"title":"Server 对象","pageTitle":"Server 对象","mdFileName":"core/server.md","url":"core/server.html","level":1},{"id":20,"parent_id":9,"title":"长连接分布式解决方案","pageTitle":"长连接分布式解决方案","mdFileName":"core/long-connection-distributed.md","url":"core/long-connection-distributed.html","level":1},{"id":21,"parent_id":0,"title":"注解","level":0},{"id":22,"parent_id":21,"title":"注入值注解","pageTitle":"注入值注解","mdFileName":"annotations/injectValue.md","url":"annotations/injectValue.html","level":1},{"id":23,"parent_id":21,"title":"方法参数过滤器","pageTitle":"方法参数过滤器","mdFileName":"annotations/filterArg.md","url":"annotations/filterArg.html","level":1},{"id":24,"parent_id":21,"title":"编写自定义注解","pageTitle":"编写自定义注解","mdFileName":"annotations/annotation.md","url":"annotations/annotation.html","level":1},{"id":25,"parent_id":21,"title":"注解管理器","pageTitle":"注解管理器","mdFileName":"annotations/annotationManager.md","url":"annotations/annotationManager.html","level":1},{"id":26,"parent_id":21,"title":"注解相关问题","pageTitle":"注解相关问题","mdFileName":"annotations/qa.md","url":"annotations/qa.html","level":1},{"id":27,"parent_id":0,"title":"多容器","level":0},{"id":28,"parent_id":27,"title":"PHP-FPM","pageTitle":"PHP-FPM","mdFileName":"container/php-fpm.md","url":"container/php-fpm.html","level":1},{"id":29,"parent_id":27,"title":"Swoole","pageTitle":"Swoole","mdFileName":"container/swoole.md","url":"container/swoole.html","level":1},{"id":30,"parent_id":29,"title":"子服务器（单项目多端口多协议）","pageTitle":"Swoole 子服务器（单项目多端口多协议）","mdFileName":"core/subServer.md","url":"core/subServer.html","level":2},{"id":31,"parent_id":29,"title":"热更新","pageTitle":"热更新","mdFileName":"components/hotupdate/index.md","url":"components/hotupdate/index.html","level":2},{"id":32,"parent_id":29,"title":"进程名称管理","pageTitle":"进程名称管理","mdFileName":"core/processNameManager.md","url":"core/processNameManager.html","level":2},{"id":33,"parent_id":29,"title":"工具类","pageTitle":"Coroutine","mdFileName":"utils/Coroutine.md","url":"utils/Coroutine.html","level":2},{"id":34,"parent_id":33,"title":"Coroutine","pageTitle":"Coroutine","mdFileName":"utils/Coroutine.md","url":"utils/Coroutine.html","level":3},{"id":35,"parent_id":33,"title":"Swoole","pageTitle":"SwooleWorker","mdFileName":"utils/Swoole.md","url":"utils/Swoole.html","level":3},{"id":36,"parent_id":33,"title":"ChannelContainer","pageTitle":"ChannelContainer","mdFileName":"utils/ChannelContainer.md","url":"utils/ChannelContainer.html","level":3},{"id":37,"parent_id":29,"title":"命令行工具","pageTitle":"进程工具","mdFileName":"dev/process-swoole.md","url":"dev/process-swoole.html","level":2},{"id":38,"parent_id":37,"title":"进程工具","pageTitle":"进程工具","mdFileName":"dev/process-swoole.md","url":"dev/process-swoole.html","level":3},{"id":39,"parent_id":29,"title":"事件列表","pageTitle":"Swoole 事件列表","mdFileName":"container/swoole/events.md","url":"container/swoole/events.html","level":2},{"id":40,"parent_id":27,"title":"Workerman","pageTitle":"Workerman","mdFileName":"container/workerman.md","url":"container/workerman.html","level":1},{"id":41,"parent_id":40,"title":"服务器配置","pageTitle":"服务器配置","mdFileName":"container/workerman/serverConfig.md","url":"container/workerman/serverConfig.html","level":2},{"id":42,"parent_id":40,"title":"命令行工具","pageTitle":"进程工具","mdFileName":"dev/process-workerman.md","url":"dev/process-workerman.html","level":2},{"id":43,"parent_id":42,"title":"进程工具","pageTitle":"进程工具","mdFileName":"dev/process-workerman.md","url":"dev/process-workerman.html","level":3},{"id":44,"parent_id":40,"title":"事件列表","pageTitle":"Workerman 事件列表","mdFileName":"container/workerman/events.md","url":"container/workerman/events.html","level":2},{"id":45,"parent_id":27,"title":"RoadRunner","pageTitle":"RoadRunner","mdFileName":"container/roadrunner.md","url":"container/roadrunner.html","level":1},{"id":46,"parent_id":45,"title":"服务器配置","pageTitle":"服务器配置","mdFileName":"container/roadrunner/serverConfig.md","url":"container/roadrunner/serverConfig.html","level":2},{"id":47,"parent_id":0,"title":"Http 服务","level":0},{"id":48,"parent_id":47,"title":"路由","pageTitle":"路由","mdFileName":"components/httpserver/route.md","url":"components/httpserver/route.html","level":1},{"id":49,"parent_id":47,"title":"请求拦截","pageTitle":"AOP 拦截请求","mdFileName":"components/httpserver/aop.md","url":"components/httpserver/aop.html","level":1},{"id":50,"parent_id":49,"title":"AOP 拦截请求","pageTitle":"AOP 拦截请求","mdFileName":"components/httpserver/aop.md","url":"components/httpserver/aop.html","level":2},{"id":51,"parent_id":49,"title":"中间件","pageTitle":"中间件","mdFileName":"components/httpserver/middleware.md","url":"components/httpserver/middleware.html","level":2},{"id":52,"parent_id":47,"title":"控制器","pageTitle":"控制器","mdFileName":"components/httpserver/controller.md","url":"components/httpserver/controller.html","level":1},{"id":53,"parent_id":47,"title":"RESTful","pageTitle":"RESTful","mdFileName":"components/httpserver/restful.md","url":"components/httpserver/restful.html","level":1},{"id":54,"parent_id":47,"title":"Session","pageTitle":"Session","mdFileName":"components/httpserver/session.md","url":"components/httpserver/session.html","level":1},{"id":55,"parent_id":47,"title":"JWT","pageTitle":"JWT","mdFileName":"components/httpserver/jwt.md","url":"components/httpserver/jwt.html","level":1},{"id":56,"parent_id":47,"title":"视图","pageTitle":"视图","mdFileName":"components/httpserver/view.md","url":"components/httpserver/view.html","level":1},{"id":57,"parent_id":47,"title":"错误异常处理","pageTitle":"错误异常处理","mdFileName":"components/httpserver/error.md","url":"components/httpserver/error.html","level":1},{"id":58,"parent_id":47,"title":"404处理","pageTitle":"404处理","mdFileName":"components/httpserver/404.md","url":"components/httpserver/404.html","level":1},{"id":59,"parent_id":47,"title":"HTTP 验证器","pageTitle":"HTTP 验证器","mdFileName":"components/httpserver/validation.md","url":"components/httpserver/validation.html","level":1},{"id":60,"parent_id":47,"title":"超全局变量","pageTitle":"超全局变量","mdFileName":"components/httpserver/superGlobals.md","url":"components/httpserver/superGlobals.html","level":1},{"id":61,"parent_id":47,"title":"请求最大执行时间","pageTitle":"最大请求执行时间","mdFileName":"components/httpserver/maxExecuteTime.md","url":"components/httpserver/maxExecuteTime.html","level":1},{"id":62,"parent_id":47,"title":"Http2","pageTitle":"Http2","mdFileName":"components/httpserver/http2.md","url":"components/httpserver/http2.html","level":1},{"id":63,"parent_id":47,"title":"跨域和 OPTIONS 请求","pageTitle":"跨域和 OPTIONS 请求","mdFileName":"components/httpserver/cros.md","url":"components/httpserver/cros.html","level":1},{"id":64,"parent_id":47,"title":"HTTPS 配置","pageTitle":"SSL","mdFileName":"components/server/ssl.md","url":"components/server/ssl.html","level":1},{"id":65,"parent_id":47,"title":"Swagger API 文档生成","pageTitle":"Swagger API 文档生成","mdFileName":"dev/generate/swagger.md","url":"dev/generate/swagger.html","level":1},{"id":66,"parent_id":0,"title":"WebSocket 服务","level":0},{"id":67,"parent_id":66,"title":"数据处理器","pageTitle":"数据处理器","mdFileName":"components/server/dataParser.md","url":"components/server/dataParser.html","level":1},{"id":68,"parent_id":66,"title":"HTTP 路由","pageTitle":"HTTP 路由","mdFileName":"components/websocketServer/httpRoute.md","url":"components/websocketServer/httpRoute.html","level":1},{"id":69,"parent_id":66,"title":"HTTP 控制器","pageTitle":"HTTP 控制器","mdFileName":"components/websocketServer/httpController.md","url":"components/websocketServer/httpController.html","level":1},{"id":70,"parent_id":66,"title":"WebSocket 路由","pageTitle":"路由","mdFileName":"components/websocketServer/route.md","url":"components/websocketServer/route.html","level":1},{"id":71,"parent_id":66,"title":"WebSocket 控制器","pageTitle":"WebSocket 控制器","mdFileName":"components/websocketServer/websocketController.md","url":"components/websocketServer/websocketController.html","level":1},{"id":72,"parent_id":66,"title":"中间件","pageTitle":"中间件","mdFileName":"components/websocketServer/middleware.md","url":"components/websocketServer/middleware.html","level":1},{"id":73,"parent_id":66,"title":"连接上下文","pageTitle":"连接上下文","mdFileName":"components/websocketServer/session.md","url":"components/websocketServer/session.html","level":1},{"id":74,"parent_id":66,"title":"连接分组","pageTitle":"连接分组","mdFileName":"components/websocketServer/group.md","url":"components/websocketServer/group.html","level":1},{"id":75,"parent_id":66,"title":"断线重连","pageTitle":"断线重连","mdFileName":"components/websocketServer/reconnect.md","url":"components/websocketServer/reconnect.html","level":1},{"id":76,"parent_id":66,"title":"不使用中间件","pageTitle":"不使用中间件","mdFileName":"components/websocketServer/noMiddleware.md","url":"components/websocketServer/noMiddleware.html","level":1},{"id":77,"parent_id":66,"title":"WSS 配置","pageTitle":"SSL","mdFileName":"components/server/ssl.md","url":"components/server/ssl.html","level":1},{"id":78,"parent_id":66,"title":"向客户端推送数据（服务器工具类）","pageTitle":"服务器工具类","mdFileName":"utils/Server.md","url":"utils/Server.html","level":1},{"id":79,"parent_id":66,"title":"WebSocket 客户端","pageTitle":"WebSocket 客户端","mdFileName":"components/websocketServer/client.md","url":"components/websocketServer/client.html","level":1},{"id":80,"parent_id":0,"title":"TCP 服务","level":0},{"id":81,"parent_id":80,"title":"数据处理器","pageTitle":"数据处理器","mdFileName":"components/server/dataParser.md","url":"components/server/dataParser.html","level":1},{"id":82,"parent_id":80,"title":"路由","pageTitle":"路由","mdFileName":"components/tcpServer/route.md","url":"components/tcpServer/route.html","level":1},{"id":83,"parent_id":80,"title":"TCP 控制器","pageTitle":"TCP 控制器","mdFileName":"components/tcpServer/controller.md","url":"components/tcpServer/controller.html","level":1},{"id":84,"parent_id":80,"title":"中间件","pageTitle":"中间件","mdFileName":"components/tcpServer/middleware.md","url":"components/tcpServer/middleware.html","level":1},{"id":85,"parent_id":80,"title":"连接上下文","pageTitle":"连接上下文","mdFileName":"components/websocketServer/session.md","url":"components/websocketServer/session.html","level":1},{"id":86,"parent_id":80,"title":"连接分组","pageTitle":"连接分组","mdFileName":"components/websocketServer/group.md","url":"components/websocketServer/group.html","level":1},{"id":87,"parent_id":80,"title":"断线重连","pageTitle":"断线重连","mdFileName":"components/websocketServer/reconnect.md","url":"components/websocketServer/reconnect.html","level":1},{"id":88,"parent_id":80,"title":"不使用中间件","pageTitle":"不使用中间件","mdFileName":"components/tcpServer/noMiddleware.md","url":"components/tcpServer/noMiddleware.html","level":1},{"id":89,"parent_id":80,"title":"向客户端推送数据（服务器工具类）","pageTitle":"服务器工具类","mdFileName":"utils/Server.md","url":"utils/Server.html","level":1},{"id":90,"parent_id":0,"title":"UDP 服务","level":0},{"id":91,"parent_id":90,"title":"数据处理器","pageTitle":"数据处理器","mdFileName":"components/server/dataParser.md","url":"components/server/dataParser.html","level":1},{"id":92,"parent_id":90,"title":"路由","pageTitle":"路由","mdFileName":"components/udpServer/route.md","url":"components/udpServer/route.html","level":1},{"id":93,"parent_id":90,"title":"UDP 控制器","pageTitle":"UDP 控制器","mdFileName":"components/udpServer/controller.md","url":"components/udpServer/controller.html","level":1},{"id":94,"parent_id":90,"title":"中间件","pageTitle":"中间件","mdFileName":"components/udpServer/middleware.md","url":"components/udpServer/middleware.html","level":1},{"id":95,"parent_id":90,"title":"不使用中间件","pageTitle":"不使用中间件","mdFileName":"components/udpServer/noMiddleware.md","url":"components/udpServer/noMiddleware.html","level":1},{"id":96,"parent_id":0,"title":"MQTT","level":0},{"id":97,"parent_id":96,"title":"MQTT 服务端","pageTitle":"MQTT 服务端","mdFileName":"components/mqtt/server.md","url":"components/mqtt/server.html","level":1},{"id":98,"parent_id":96,"title":"MQTT 客户端","pageTitle":"MQTT 客户端","mdFileName":"components/mqtt/client.md","url":"components/mqtt/client.html","level":1},{"id":99,"parent_id":0,"title":"RPC 服务","level":0},{"id":100,"parent_id":99,"title":"Hprose","pageTitle":"Hprose","mdFileName":"components/rpc/hprose.md","url":"components/rpc/hprose.html","level":1},{"id":101,"parent_id":99,"title":"gRPC","pageTitle":"gRPC","mdFileName":"components/rpc/grpc.md","url":"components/rpc/grpc.html","level":1},{"id":102,"parent_id":0,"title":"功能组件","level":0},{"id":103,"parent_id":102,"title":"配置读写","pageTitle":"配置(Config)","mdFileName":"components/config/index.md","url":"components/config/index.html","level":1},{"id":104,"parent_id":102,"title":"连接池","pageTitle":"连接池","mdFileName":"components/pool/index.md","url":"components/pool/index.html","level":1},{"id":105,"parent_id":102,"title":"数据库 (Db)","pageTitle":"数据库","mdFileName":"components/db/index.md","url":"components/db/index.html","level":1},{"id":106,"parent_id":105,"title":"数据库驱动","pageTitle":"数据库","mdFileName":"components/db/index.md","url":"components/db/index.html","level":2},{"id":107,"parent_id":106,"title":"MySQL","pageTitle":"MySQL","mdFileName":"components/db/mysql.md","url":"components/db/mysql.html","level":3},{"id":108,"parent_id":106,"title":"PostgreSQL","pageTitle":"PostgreSQL","mdFileName":"components/db/pgsql.md","url":"components/db/pgsql.html","level":3},{"id":109,"parent_id":105,"title":"数据库操作","pageTitle":"数据库","mdFileName":"components/db/index.md","url":"components/db/index.html","level":2},{"id":110,"parent_id":105,"title":"SQL 监听","pageTitle":"SQL 监听","mdFileName":"components/db/sqlListener.md","url":"components/db/sqlListener.html","level":2},{"id":111,"parent_id":102,"title":"ORM","pageTitle":"ORM","mdFileName":"components/orm/index.md","url":"components/orm/index.html","level":1},{"id":112,"parent_id":111,"title":"使用说明","pageTitle":"ORM","mdFileName":"components/orm/index.md","url":"components/orm/index.html","level":2},{"id":113,"parent_id":111,"title":"数据库表模型","pageTitle":"数据库表模型","mdFileName":"components/orm/RDModel.md","url":"components/orm/RDModel.html","level":2},{"id":114,"parent_id":113,"title":"模型配置","pageTitle":"模型配置","mdFileName":"components/orm/config.md","url":"components/orm/config.html","level":3},{"id":115,"parent_id":113,"title":"使用方法","pageTitle":"数据库表模型","mdFileName":"components/orm/RDModel.md","url":"components/orm/RDModel.html","level":3},{"id":116,"parent_id":113,"title":"模型生成","pageTitle":"模型生成","mdFileName":"dev/generate/model.md","url":"dev/generate/model.html","level":3},{"id":117,"parent_id":113,"title":"表生成","pageTitle":"表生成","mdFileName":"dev/generate/table.md","url":"dev/generate/table.html","level":3},{"id":118,"parent_id":113,"title":"模型事件","pageTitle":"模型事件","mdFileName":"components/orm/RDModel/event.md","url":"components/orm/RDModel/event.html","level":3},{"id":119,"parent_id":113,"title":"树形表模型","pageTitle":"TreeModel","mdFileName":"components/orm/TreeModel.md","url":"components/orm/TreeModel.html","level":3},{"id":120,"parent_id":113,"title":"模型软删除","pageTitle":"模型软删除","mdFileName":"components/orm/softDelete.md","url":"components/orm/softDelete.html","level":3},{"id":121,"parent_id":111,"title":"模型关联","pageTitle":"介绍","mdFileName":"components/orm/relation/index.md","url":"components/orm/relation/index.html","level":2},{"id":122,"parent_id":121,"title":"使用说明","pageTitle":"介绍","mdFileName":"components/orm/relation/index.md","url":"components/orm/relation/index.html","level":3},{"id":123,"parent_id":121,"title":"一对一关联","pageTitle":"一对一关联","mdFileName":"components/orm/relation/oneToOne.md","url":"components/orm/relation/oneToOne.html","level":3},{"id":124,"parent_id":121,"title":"一对多关联","pageTitle":"一对多关联","mdFileName":"components/orm/relation/oneToMany.md","url":"components/orm/relation/oneToMany.html","level":3},{"id":125,"parent_id":121,"title":"多对多关联","pageTitle":"多对多关联","mdFileName":"components/orm/relation/manyToMany.md","url":"components/orm/relation/manyToMany.html","level":3},{"id":126,"parent_id":121,"title":"多态一对一关联","pageTitle":"多态一对一关联","mdFileName":"components/orm/relation/polymorphicOneToOne.md","url":"components/orm/relation/polymorphicOneToOne.html","level":3},{"id":127,"parent_id":121,"title":"多态一对多关联","pageTitle":"多态一对多关联","mdFileName":"components/orm/relation/polymorphicOneToMany.md","url":"components/orm/relation/polymorphicOneToMany.html","level":3},{"id":128,"parent_id":121,"title":"多态多对多关联","pageTitle":"多态多对多关联","mdFileName":"components/orm/relation/polymorphicManyToMany.md","url":"components/orm/relation/polymorphicManyToMany.html","level":3},{"id":129,"parent_id":121,"title":"前置和后置事件","pageTitle":"前置和后置事件","mdFileName":"components/orm/relation/events.md","url":"components/orm/relation/events.html","level":3},{"id":130,"parent_id":102,"title":"Redis","pageTitle":"Redis","mdFileName":"components/redis/index.md","url":"components/redis/index.html","level":1},{"id":131,"parent_id":102,"title":"Redis 模型","pageTitle":"Redis 模型","mdFileName":"components/orm/RedisModel.md","url":"components/orm/RedisModel.html","level":1},{"id":132,"parent_id":102,"title":"内存表模型","pageTitle":"内存表模型","mdFileName":"components/orm/MemoryTableModel.md","url":"components/orm/MemoryTableModel.html","level":1},{"id":133,"parent_id":102,"title":"缓存","pageTitle":"缓存","mdFileName":"components/cache/index.md","url":"components/cache/index.html","level":1},{"id":134,"parent_id":133,"title":"使用说明","pageTitle":"缓存","mdFileName":"components/cache/index.md","url":"components/cache/index.html","level":2},{"id":135,"parent_id":133,"title":"File","pageTitle":"文件缓存","mdFileName":"components/cache/file.md","url":"components/cache/file.html","level":2},{"id":136,"parent_id":133,"title":"Redis","pageTitle":"Redis Cache","mdFileName":"components/cache/redis.md","url":"components/cache/redis.html","level":2},{"id":137,"parent_id":133,"title":"RedisHash","pageTitle":"Redis Cache","mdFileName":"components/cache/redisHash.md","url":"components/cache/redisHash.html","level":2},{"id":138,"parent_id":133,"title":"Apcu","pageTitle":"Apcu 缓存","mdFileName":"components/cache/apcu.md","url":"components/cache/apcu.html","level":2},{"id":139,"parent_id":102,"title":"日志","pageTitle":"日志","mdFileName":"components/log/index.md","url":"components/log/index.html","level":1},{"id":140,"parent_id":102,"title":"验证器","pageTitle":"验证器","mdFileName":"components/validation/index.md","url":"components/validation/index.html","level":1},{"id":141,"parent_id":102,"title":"门面 (Facade)","pageTitle":"门面 (Facade)","mdFileName":"components/facade/index.md","url":"components/facade/index.html","level":1},{"id":142,"parent_id":102,"title":"请求上下文代理 (RequestContextProxy)","pageTitle":"请求上下文代理（RequestContextProxy）","mdFileName":"components/requestContextProxy/index.md","url":"components/requestContextProxy/index.html","level":1},{"id":143,"parent_id":102,"title":"Lock 锁","pageTitle":"锁","mdFileName":"components/lock/index.md","url":"components/lock/index.html","level":1},{"id":144,"parent_id":143,"title":"使用方法","pageTitle":"锁","mdFileName":"components/lock/index.md","url":"components/lock/index.html","level":2},{"id":145,"parent_id":143,"title":"RedisLock","pageTitle":"RedisLock","mdFileName":"components/lock/redis.md","url":"components/lock/redis.html","level":2},{"id":146,"parent_id":143,"title":"AtomicLock","pageTitle":"AtomicLock","mdFileName":"components/lock/atomic.md","url":"components/lock/atomic.html","level":2},{"id":147,"parent_id":102,"title":"后台任务","pageTitle":"后台任务","mdFileName":"components/task/index.md","url":"components/task/index.html","level":1},{"id":148,"parent_id":102,"title":"定时任务","pageTitle":"定时任务","mdFileName":"components/task/cron.md","url":"components/task/cron.html","level":1},{"id":149,"parent_id":102,"title":"AOP","pageTitle":"AOP","mdFileName":"components/aop/index.md","url":"components/aop/index.html","level":1},{"id":150,"parent_id":102,"title":"进程","pageTitle":"进程","mdFileName":"components/process/index.md","url":"components/process/index.html","level":1},{"id":151,"parent_id":102,"title":"进程池-Swoole","pageTitle":"进程池-Swoole","mdFileName":"components/process-pool/swoole.md","url":"components/process-pool/swoole.html","level":1},{"id":152,"parent_id":102,"title":"进程池-imi","pageTitle":"进程池-imi","mdFileName":"components/process-pool/imi.md","url":"components/process-pool/imi.html","level":1},{"id":153,"parent_id":102,"title":"定时器","pageTitle":"定时器","mdFileName":"components/timer/index.md","url":"components/timer/index.html","level":1},{"id":154,"parent_id":102,"title":"异步执行","pageTitle":"异步执行","mdFileName":"components/async/index.md","url":"components/async/index.html","level":1},{"id":155,"parent_id":102,"title":"雪花算法发号器","pageTitle":"雪花算法发号器","mdFileName":"components/snowflake.md","url":"components/snowflake.html","level":1},{"id":156,"parent_id":102,"title":"imi 组件列表一览","pageTitle":"imi 组件列表一览","mdFileName":"components/list.md","url":"components/list.html","level":1},{"id":157,"parent_id":156,"title":"MQTT","pageTitle":"MQTT 服务端","mdFileName":"components/mqtt/server.md","url":"components/mqtt/server.html","level":2},{"id":158,"parent_id":156,"title":"gRPC","pageTitle":"gRPC","mdFileName":"components/rpc/grpc.md","url":"components/rpc/grpc.html","level":2},{"id":159,"parent_id":156,"title":"Hprose","pageTitle":"Hprose","mdFileName":"components/rpc/hprose.md","url":"components/rpc/hprose.html","level":2},{"id":160,"parent_id":156,"title":"消息队列","pageTitle":"Redis 消息队列","mdFileName":"components/mq/redis.md","url":"components/mq/redis.html","level":2},{"id":161,"parent_id":156,"title":"AMQP","pageTitle":"AMQP","mdFileName":"components/mq/amqp.md","url":"components/mq/amqp.html","level":2},{"id":162,"parent_id":156,"title":"Kafka","pageTitle":"Kafka","mdFileName":"components/mq/kafka.md","url":"components/mq/kafka.html","level":2},{"id":163,"parent_id":156,"title":"JWT","pageTitle":"JWT","mdFileName":"components/httpserver/jwt.md","url":"components/httpserver/jwt.html","level":2},{"id":164,"parent_id":156,"title":"权限控制","pageTitle":"权限控制","mdFileName":"components/access-control.md","url":"components/access-control.html","level":2},{"id":165,"parent_id":156,"title":"Smarty 模版引擎","pageTitle":"Smarty 模版引擎","mdFileName":"components/smarty.md","url":"components/smarty.html","level":2},{"id":166,"parent_id":156,"title":"限流","pageTitle":"限流","mdFileName":"components/rate-limit.md","url":"components/rate-limit.html","level":2},{"id":167,"parent_id":156,"title":"跨进程变量共享","pageTitle":"跨进程变量共享","mdFileName":"components/shared-memory.md","url":"components/shared-memory.html","level":2},{"id":168,"parent_id":156,"title":"雪花算法发号器","pageTitle":"雪花算法发号器","mdFileName":"components/snowflake.md","url":"components/snowflake.html","level":2},{"id":169,"parent_id":156,"title":"Swagger API 文档生成","pageTitle":"Swagger API 文档生成","mdFileName":"dev/generate/swagger.md","url":"dev/generate/swagger.html","level":2},{"id":170,"parent_id":156,"title":"Swoole Tracker","pageTitle":"swoole-tracker","mdFileName":"components/swoole-tracker.md","url":"components/swoole-tracker.html","level":2},{"id":171,"parent_id":0,"title":"消息队列","level":0},{"id":172,"parent_id":171,"title":"Redis","pageTitle":"Redis 消息队列","mdFileName":"components/mq/redis.md","url":"components/mq/redis.html","level":1},{"id":173,"parent_id":171,"title":"Redis Stream","pageTitle":"Redis Stream 消息队列","mdFileName":"components/mq/redisStream.md","url":"components/mq/redisStream.html","level":1},{"id":174,"parent_id":171,"title":"RabbitMQ(AMQP)","pageTitle":"AMQP","mdFileName":"components/mq/amqp.md","url":"components/mq/amqp.html","level":1},{"id":175,"parent_id":171,"title":"Kafka","pageTitle":"Kafka","mdFileName":"components/mq/kafka.md","url":"components/mq/kafka.html","level":1},{"id":176,"parent_id":0,"title":"数据结构","level":0},{"id":177,"parent_id":176,"title":"通用数据结构","pageTitle":"枚举","mdFileName":"components/struct/enum.md","url":"components/struct/enum.html","level":1},{"id":178,"parent_id":177,"title":"Enum(枚举)","pageTitle":"枚举","mdFileName":"components/struct/enum.md","url":"components/struct/enum.html","level":2},{"id":179,"parent_id":177,"title":"ArrayData(数组数据)","pageTitle":"ArrayData","mdFileName":"components/struct/ArrayData.md","url":"components/struct/ArrayData.html","level":2},{"id":180,"parent_id":177,"title":"LazyArrayObject(智能数组对象)","pageTitle":"LazyArrayObject","mdFileName":"components/struct/LazyArrayObject.md","url":"components/struct/LazyArrayObject.html","level":2},{"id":181,"parent_id":177,"title":"ArrayList(数组列表)","pageTitle":"ArrayList","mdFileName":"components/struct/ArrayList.md","url":"components/struct/ArrayList.html","level":2},{"id":182,"parent_id":177,"title":"FilterableList(过滤器列表)","pageTitle":"FilterableList","mdFileName":"components/struct/FilterableList.md","url":"components/struct/FilterableList.html","level":2},{"id":183,"parent_id":176,"title":"Swoole 数据结构","pageTitle":"Atomic","mdFileName":"components/struct/atomic.md","url":"components/struct/atomic.html","level":1},{"id":184,"parent_id":183,"title":"Atomic(原子性)","pageTitle":"Atomic","mdFileName":"components/struct/atomic.md","url":"components/struct/atomic.html","level":2},{"id":185,"parent_id":183,"title":"Channel(通道)","pageTitle":"协程 Channel","mdFileName":"components/struct/co-channel.md","url":"components/struct/co-channel.html","level":2},{"id":186,"parent_id":183,"title":"MemoryTable(内存表)","pageTitle":"MemoryTable","mdFileName":"components/struct/memory-table.md","url":"components/struct/memory-table.html","level":2},{"id":187,"parent_id":0,"title":"通用工具类","level":0},{"id":188,"parent_id":187,"title":"App 类","pageTitle":"App 类","mdFileName":"utils/app.md","url":"utils/app.html","level":1},{"id":189,"parent_id":187,"title":"全局函数","pageTitle":"全局函数","mdFileName":"utils/functions.md","url":"utils/functions.html","level":1},{"id":190,"parent_id":187,"title":"Imi","pageTitle":"Imi","mdFileName":"utils/Imi.md","url":"utils/Imi.html","level":1},{"id":191,"parent_id":187,"title":"Worker","pageTitle":"Worker","mdFileName":"utils/Worker.md","url":"utils/Worker.html","level":1},{"id":192,"parent_id":187,"title":"ArrayUtil","pageTitle":"ArrayUtil","mdFileName":"utils/ArrayUtil.md","url":"utils/ArrayUtil.html","level":1},{"id":193,"parent_id":187,"title":"Bit","pageTitle":"Bit","mdFileName":"utils/Bit.md","url":"utils/Bit.html","level":1},{"id":194,"parent_id":187,"title":"ClassObject","pageTitle":"ClassObject","mdFileName":"utils/ClassObject.md","url":"utils/ClassObject.html","level":1},{"id":195,"parent_id":187,"title":"File","pageTitle":"File","mdFileName":"utils/File.md","url":"utils/File.html","level":1},{"id":196,"parent_id":187,"title":"ObjectArrayHelper","pageTitle":"ObjectArrayHelper","mdFileName":"utils/ObjectArrayHelper.md","url":"utils/ObjectArrayHelper.html","level":1},{"id":197,"parent_id":187,"title":"Random","pageTitle":"Random","mdFileName":"utils/Random.md","url":"utils/Random.html","level":1},{"id":198,"parent_id":187,"title":"Text","pageTitle":"Text","mdFileName":"utils/Text.md","url":"utils/Text.html","level":1},{"id":199,"parent_id":187,"title":"Pagination","pageTitle":"Pagination","mdFileName":"utils/Pagination.md","url":"utils/Pagination.html","level":1},{"id":200,"parent_id":187,"title":"DateTime","pageTitle":"DateTime","mdFileName":"utils/DateTime.md","url":"utils/DateTime.html","level":1},{"id":201,"parent_id":187,"title":"KVStorage","pageTitle":"KVStorage","mdFileName":"utils/KVStorage.md","url":"utils/KVStorage.html","level":1},{"id":202,"parent_id":187,"title":"ServerManager","pageTitle":"ServerManage","mdFileName":"utils/ServerManager.md","url":"utils/ServerManager.html","level":1},{"id":203,"parent_id":187,"title":"服务器工具类","pageTitle":"服务器工具类","mdFileName":"utils/Server.md","url":"utils/Server.html","level":1},{"id":204,"parent_id":0,"title":"开发工具","level":0},{"id":205,"parent_id":204,"title":"介绍","pageTitle":"介绍","mdFileName":"dev/intro.md","url":"dev/intro.html","level":1},{"id":206,"parent_id":204,"title":"生成工具","pageTitle":"生成工具","mdFileName":"dev/generate.md","url":"dev/generate.html","level":1},{"id":207,"parent_id":206,"title":"模型生成","pageTitle":"模型生成","mdFileName":"dev/generate/model.md","url":"dev/generate/model.html","level":2},{"id":208,"parent_id":206,"title":"表生成","pageTitle":"表生成","mdFileName":"dev/generate/table.md","url":"dev/generate/table.html","level":2},{"id":209,"parent_id":206,"title":"控制器生成","pageTitle":"控制器生成","mdFileName":"dev/generate/controller.md","url":"dev/generate/controller.html","level":2},{"id":210,"parent_id":204,"title":"自己动手开发命令行工具","pageTitle":"自己动手开发命令行工具","mdFileName":"dev/tool.md","url":"dev/tool.html","level":1},{"id":211,"parent_id":0,"title":"进阶开发","level":0},{"id":212,"parent_id":211,"title":"断点调试","pageTitle":"断点调试","mdFileName":"adv/debug.md","url":"adv/debug.html","level":1},{"id":213,"parent_id":211,"title":"生产环境性能优化","pageTitle":"生产环境性能优化","mdFileName":"adv/performance.md","url":"adv/performance.html","level":1},{"id":214,"parent_id":211,"title":"帮助 imi 变得更好","pageTitle":"参与框架开发","mdFileName":"adv/devp.md","url":"adv/devp.html","level":1},{"id":215,"parent_id":0,"title":"运行环境","level":0},{"id":216,"parent_id":215,"title":"Docker","pageTitle":"Docker","mdFileName":"production/docker.md","url":"production/docker.html","level":1},{"id":217,"parent_id":215,"title":"守护进程","pageTitle":"守护进程","mdFileName":"production/daemon.md","url":"production/daemon.html","level":1},{"id":218,"parent_id":215,"title":"Swoole Compiler 代码加密","pageTitle":"Swoole Compiler 代码加密","mdFileName":"production/swoole-compiler.md","url":"production/swoole-compiler.html","level":1},{"id":219,"parent_id":0,"title":"Swoole 协程化组件","level":0},{"id":220,"parent_id":219,"title":"Guzzle","pageTitle":"Guzzle","mdFileName":"other/guzzle.md","url":"other/guzzle.html","level":1},{"id":221,"parent_id":219,"title":"ElasticSearch","pageTitle":"ElasticSearch","mdFileName":"other/elasticsearch.md","url":"other/elasticsearch.html","level":1},{"id":222,"parent_id":219,"title":"YurunHttp","pageTitle":"YurunHttp","mdFileName":"other/yurunhttp.md","url":"other/yurunhttp.html","level":1},{"id":223,"parent_id":219,"title":"第三方授权 SDK","pageTitle":"第三方授权 SDK","mdFileName":"other/yurun-oauth-login.md","url":"other/yurun-oauth-login.html","level":1},{"id":224,"parent_id":219,"title":"第三方支付 SDK","pageTitle":"第三方支付 SDK","mdFileName":"other/paysdk.md","url":"other/paysdk.html","level":1}];
+                    for(var i = 0; i < catalogList.length; ++i)
+                    {
+                        if(void 0 !== catalogList[i].url)
+                        {
+                            catalogList[i].url = rootPath + catalogList[i].url;
+                        }
+                    }
+                    initTree(catalogList);
+                </script>
+                <h1 id="数据库表模型"><a href="#数据库表模型">数据库表模型</a></h1><h2 id="介绍"><a href="#介绍">介绍</a></h2><p>传统关系型数据库（MySQL）的模型，日常增删改查完全够用，支持复合主键、联合主键。</p><p>需要注意的是，imi 的模型与传统 TP 等框架中的模型概念有些差别。</p><p>imi 的模型类里一般不写逻辑代码，模型类的一个对象就代表一条记录，并且所有字段都需要有值（除非你不定义指定的字段）。</p><h2 id="模型定义"><a href="#模型定义">模型定义</a></h2><p>喜闻乐见的对命名空间、类名无要求，只要按照规定写注解即可！</p><p><code>@Entity</code> 注解为定义实体类</p><p><code>@Table</code> 注解为定义数据表</p><p><code>@Column</code> 注解为定义字段</p><p><code>@DDL</code> 定义表结构的 SQL 语句</p><blockquote>建议使用模型生成工具：<a href="https://doc.imiphp.com/v2.0/dev/generate/model.html">https://doc.imiphp.com/v2.0/dev/generate/model.html</a></blockquote><p>具体定义看下面代码：</p><pre><code class="php">namespace Test;
+
+use Imi\Model\Model;
+use Imi\Model\Annotation\Table;
+use Imi\Model\Annotation\Column;
+use Imi\Model\Annotation\Entity;
+
+/**
+ * 定义为实体
+ * @Entity
+ * 指定实体为test，复合主键id和a
+ * @Table(name=&quot;test&quot;, id={&quot;id&quot;, &quot;a&quot;})
+ */
+class Test extends Model
+{
+    /**
+     * ID
+     * 字段id，类型int，长度10，是主键，第0个主键，是自增字段
+     * @Column(name=&quot;id&quot;, type=&quot;int&quot;, length=10, isPrimaryKey=true, primaryKeyIndex=0, isAutoIncrement=true)
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * aaa
+     * @Column(name=&quot;a&quot;, type=&quot;string&quot;, length=255, isPrimaryKey=true, primaryKeyIndex=1)
+     * @var string
+     */
+    protected $a;
+
+    /**
+     * bbb
+     * @Column(name=&quot;b&quot;, type=&quot;string&quot;, length=255)
+     * @var string
+     */
+    protected $b;
+
+    /**
+     * ccc
+     * @Column(name=&quot;c&quot;, type=&quot;string&quot;, length=255)
+     * @var string
+     */
+    protected $c;
+
+    /**
+     * Get iD
+     *
+     * @return  int
+     */
+    public function getId()
+    {
+        return $this-&gt;id;
+    }
+
+    /**
+     * Set iD
+     *
+     * @param  int  $id  ID
+     *
+     * @return  self
+     */
+    public function setId(int $id)
+    {
+        $this-&gt;id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get aaa
+     *
+     * @return  string
+     */
+    public function getA()
+    {
+        return $this-&gt;a;
+    }
+
+    /**
+     * Set aaa
+     *
+     * @param  string  $a  aaa
+     *
+     * @return  self
+     */
+    public function setA(string $a)
+    {
+        $this-&gt;a = $a;
+
+        return $this;
+    }
+
+    /**
+     * Get bbb
+     *
+     * @return  string
+     */
+    public function getB()
+    {
+        return $this-&gt;b;
+    }
+
+    /**
+     * Set bbb
+     *
+     * @param  string  $b  bbb
+     *
+     * @return  self
+     */
+    public function setB(string $b)
+    {
+        $this-&gt;b = $b;
+
+        return $this;
+    }
+
+    /**
+     * Get ccc
+     *
+     * @return  string
+     */
+    public function getC()
+    {
+        return $this-&gt;c;
+    }
+
+    /**
+     * Set ccc
+     *
+     * @param  string  $c  ccc
+     *
+     * @return  self
+     */
+    public function setC(string $c)
+    {
+        $this-&gt;c = $c;
+
+        return $this;
+    }
+}</code></pre><p>需要使用注解将表、字段属性全部标注。并且写上<code>get</code>和<code>set</code>方法，可以使用模型生成工具生成。</p><p>模型中可以加入虚拟字段，通过注解<code>@Column(virtual=true)</code>，虚拟字段不参与数据库操作。</p><h2 id="模型注解"><a href="#模型注解">模型注解</a></h2><h3 id="@Entity"><a href="#@Entity">@Entity</a></h3><p>写在类上，定义类为实体模型类</p><p><strong>用法：</strong></p><p><code>@Entity</code></p><p>序列化时不使用驼峰命名，使用原本的字段名：</p><p><code>@Entity(false)</code></p><p>将模型设为非 bean 类：</p><p><code>@Entity(camel=true, bean=false)</code></p><blockquote>非 bean 类性能更好，但无法用 AOP 切入类，事件也不生效，一般模型建议使用非 bean 类模式。</blockquote><h3 id="@Table"><a href="#@Table">@Table</a></h3><p>写在类上，定义数据表</p><p><strong>用法：</strong></p><p><code>@Table(&#039;tb_user&#039;)</code></p><p>指定数据库连接池：</p><p><code>@Table(name=&#039;tb_user&#039;, dbPoolName=&#039;指定数据库连接池名&#039;)</code></p><p>指定主键：</p><p><code>@Table(name=&#039;tb_user&#039;, id=&#039;id&#039;)</code></p><p>指定多个主键</p><p><code>@Table(name=&#039;tb_user&#039;, id={&#039;id1&#039;, &#039;id2&#039;})</code></p><h3 id="@DDL"><a href="#@DDL">@DDL</a></h3><p>写在类上，定义表结构</p><p><strong>用法：</strong></p><pre><code class="php">/**
+ * ArticleBase
+ * @Entity
+ * @Table(name=&quot;tb_article&quot;, id={&quot;id&quot;})
+ * @DDL(&quot;CREATE TABLE `tb_article` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `content` mediumtext NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT&quot;)
+ * @property int $id
+ * @property string $title
+ * @property string $content
+ * @property string $time
+ */
+abstract class ArticleBase extends Model
+{
+}</code></pre><h3 id="@JsonEncode"><a href="#@JsonEncode">@JsonEncode</a></h3><p>写在类上，设定 JSON 序列化时的配置</p><p>不使用 Unicode 编码转换中文：<code>@JsonEncode(JSON_UNESCAPED_UNICODE)</code></p><p>完整参数：<code>@JsonEncode(flags=\JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, depth=512)</code></p><h3 id="@Column"><a href="#@Column">@Column</a></h3><p>写在属性上，定义字段列</p><p><code>@Column(name=&quot;字段名&quot;, type=&quot;字段类型&quot;, length=&quot;长度&quot;, nullable=&quot;是否允许为空true/false&quot;, accuracy=&quot;精度，小数位后几位&quot;, default=&quot;默认值&quot;, isPrimaryKey=&quot;是否为主键true/false&quot;, primaryKeyIndex=&quot;联合主键中的第几个，从0开始&quot;, isAutoIncrement=&quot;是否为自增字段true/false&quot;, virtual=&quot;虚拟字段，不参与数据库操作true/false&quot;, updateTime=true, reference=&quot;引用字段名，作为引用字段的别名使用，拥有同等的读写能力，需要将virtual设为true&quot;, unsigned=false)</code></p><blockquote><p>当你指定<code>type=json</code>时，写入数据库时自动<code>json_encode</code>，从数据实例化到对象时自动<code>json_decode</code></p><p>当你指定<code>type=list</code>并且设置了<code>listSeparator</code>分割符时，写入数据库时自动<code>implode</code>，从数据实例化到对象时自动<code>explode</code></p></blockquote><p><code>updateTime</code>：save/update 模型时是否将当前时间写入该字段。支持 date/time/datetime/timestamp/year/int/bigint。当字段为 int 类型，写入秒级时间戳。当字段为 bigint 类型，写入毫秒级时间戳。</p><h3 id="@Sql"><a href="#@Sql">@Sql</a></h3><p>为虚拟字段定义 SQL 语句，模型查询时自动带上改字段。</p><p><code>@Sql(&quot;SQL 语句&quot;)</code></p><p>如果 <code>@Column</code> 注解定义了 <code>name</code> 属性，则将 <code>name</code> 作为字段别名；如果未定义，则使用属性名称作为别名。</p><p>示例：</p><pre><code class="php">&lt;?php
+
+namespace Imi\Test\Component\Model;
+
+use Imi\Bean\Annotation\Inherit;
+use Imi\Model\Annotation\Column;
+use Imi\Model\Annotation\Serializables;
+use Imi\Model\Annotation\Sql;
+use Imi\Test\Component\Model\Base\MemberBase;
+
+/**
+ * Member.
+ *
+ * @Inherit
+ * @Serializables(mode=&quot;deny&quot;, fields={&quot;password&quot;})
+ */
+class MemberWithSqlField extends MemberBase
+{
+    /**
+     * @Column(name=&quot;a&quot;, virtual=true)
+     * @Sql(&quot;1+1&quot;)
+     *
+     * @var int
+     */
+    public $test1;
+
+    /**
+     * @Column(virtual=true)
+     * @Sql(&quot;2+2&quot;)
+     *
+     * @var int
+     */
+    public $test2;
+
+    /**
+     * Set the value of test1.
+     *
+     * @param int $test1
+     *
+     * @return self
+     */
+    public function setTest1(int $test1)
+    {
+        $this-&gt;test1 = $test1;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of test1.
+     *
+     * @return int
+     */
+    public function getTest1()
+    {
+        return $this-&gt;test1;
+    }
+
+    /**
+     * Set the value of test2.
+     *
+     * @param int $test2
+     *
+     * @return self
+     */
+    public function setTest2(int $test2)
+    {
+        $this-&gt;test2 = $test2;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of test2.
+     *
+     * @return int
+     */
+    public function getTest2()
+    {
+        return $this-&gt;test2;
+    }
+}</code></pre><p>查询时的 SQL 语句：</p><pre><code class="sql">select `tb_member`.*,(1+1) as `a`,(2+2) as `test2` from `tb_member` where `id`=:id limit 1</code></pre><h3 id="@JsonNotNull"><a href="#@JsonNotNull">@JsonNotNull</a></h3><p>写在属性上，无参数。</p><p>当字段值不为 null 时才序列化到 json</p><h3 id="@Serializable"><a href="#@Serializable">@Serializable</a></h3><p>写在属性上，序列化注解</p><p><strong>用法：</strong></p><p>禁止参与序列化（<code>toArray()</code>或<code>json_encode()</code>不包含该字段）：</p><p><code>@Serializable(false)</code></p><h3 id="@Serializables"><a href="#@Serializables">@Serializables</a></h3><p>写在类上，批量设置序列化注解，优先级低于针对属性单独设置的<code>@Serializable</code>注解</p><p><strong>用法：</strong></p><p>白名单（序列化后只显示id、name字段）：</p><p><code>@Serializables(mode=&quot;allow&quot;, fields={&quot;id&quot;, &quot;name&quot;})</code></p><p>黑名单（序列化后，排除id、name字段）</p><p><code>@Serializables(mode=&quot;deny&quot;, fields={&quot;id&quot;, &quot;name&quot;})</code></p><h3 id="@ExtractProperty"><a href="#@ExtractProperty">@ExtractProperty</a></h3><p>写在属性上，提取字段中的属性到当前模型</p><p><strong>用法：</strong></p><p>提取该属性中的<code>userId</code>值到当前模型中的<code>userId</code>：</p><p><code>@ExtractProperty(&quot;userId&quot;)</code></p><p>提取该属性中的<code>userId</code>值到当前模型中的<code>userId2</code>：</p><p><code>@ExtractProperty(fieldName=&quot;userId&quot;, alias=&quot;userId2&quot;)</code></p><p>支持多级提取到当前模型中的<code>userId2</code>：</p><pre><code class="php">/**
+ * @ExtractProperty(fieldName=&quot;ex.userId&quot;, alias=&quot;userId2&quot;)
+ */
+protected $xxx = [
+    &#039;ex&#039;    =&gt;    [
+        &#039;userId&#039;    =&gt;    123,
+    ],
+];</code></pre><h2 id="模型操作"><a href="#模型操作">模型操作</a></h2><h3 id="初始化模型"><a href="#初始化模型">初始化模型</a></h3><pre><code class="php">$testModel = TestModel::newInstance([
+    &#039;a&#039;    =&gt;    &#039;abc&#039;,
+    &#039;b&#039;    =&gt;    &#039;def&#039;,
+]);</code></pre><p>第二种方法：</p><pre><code class="php">$testModel = TestModel::newInstance();
+$testModel-&gt;set([
+    &#039;a&#039;    =&gt;    &#039;abc&#039;,
+    &#039;b&#039;    =&gt;    &#039;def&#039;,
+]);</code></pre><h3 id="插入"><a href="#插入">插入</a></h3><pre><code class="php">$testModel = TestModel::newInstance();
+$testModel-&gt;setA(&#039;1&#039;);
+$testModel-&gt;setB(&#039;1&#039;);
+$testModel-&gt;setC(&#039;1&#039;);
+$result = $testModel-&gt;insert();
+// $result 用法同数据库中的 insert() 返回值用法
+echo &#039;插入的自增ID：&#039;, $testModel-&gt;getId();</code></pre><blockquote>未设置值的字段（以注解定义为准），默认以 <code>null</code> 值插入，如有需要建议给字段设置默认值</blockquote><h3 id="更新"><a href="#更新">更新</a></h3><pre><code class="php">$testModel = TestModel::find(1, &#039;abc&#039;);
+$result = $testModel-&gt;update();
+// $result 用法同数据库中的 update() 返回值用法</code></pre><h3 id="保存"><a href="#保存">保存</a></h3><pre><code class="php">// 自动判断是插入还是更新
+$testModel-&gt;save();</code></pre><h3 id="删除"><a href="#删除">删除</a></h3><pre><code class="php">$testModel = TestModel::find(1, &#039;abc&#039;);
+$result = $testModel-&gt;delete();
+// $result 用法同数据库中的 delete() 返回值用法</code></pre><h2 id="查询构建器"><a href="#查询构建器">查询构建器</a></h2><p>imi 中数据库查询连贯操作都来自于查询器，查询器的创建方式：</p><p><strong>查询结果返回模型对象：</strong></p><pre><code class="php">$query = TestModel::query();</code></pre><blockquote><code>query()</code> 方法返回的类是 <code>Imi\Model\Contract\IModelQuery</code>，它继承了 <code>Imi\Db\Query\Interfaces\IQuery</code>，并且有扩展特性</blockquote><p><strong>查询结果返回数组：</strong></p><pre><code class="php">$query = TestModel::dbQuery();</code></pre><blockquote><code>dbQuery()</code> 方法返回的类是 <code>Imi\Db\Query\Interfaces\IQuery</code>，与 <code>Imi\Db\Db::query()</code> 返回完全一致</blockquote><p><strong>IModelQuery 扩展特性：</strong></p><h3 id="关联模型预加载"><a href="#关联模型预加载">关联模型预加载</a></h3><pre><code class="php">$list = TestModel::query()
+                -&gt;with(&#039;关联字段名&#039;) // 单个
+                -&gt;with([&#039;字段名1&#039;, &#039;字段名2&#039;]) // 多个
+                -&gt;with([
+                    // 回调第一个参数是：模型查询构建器
+                    // 第二个参数是当前关联查询对应的注解对象，如果不确定什么类型可以写 RelationBase，如果确定类型也可以写具体类型，比如：\Imi\Model\Annotation\Relation\OneToOne
+                    &#039;字段名1&#039; =&gt; function(\Imi\Model\Contract\IModelQuery $query, \Imi\Model\Annotation\Relation\RelationBase $annotation) {
+                        $query-&gt;withField(&#039;a&#039;, &#039;b&#039;); // 限定查询结果模型的可序列化字段
+                    },
+                ]) // 回调
+                -&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;select()-&gt;getArray();</code></pre><blockquote>使用预加载后，模型关联的前后置事件都不会触发</blockquote><hr><blockquote>和 <code>withField()</code> 一起用时，<code>with()</code> 中查询的关联字段可以手动获取。但如果要在 JSON 序列化时返回，需要在 <code>withField()</code> 中指定该关联字段</blockquote><pre><code class="php">$list = TestModel::query()-&gt;with([&#039;a&#039;])-&gt;withField(&#039;b&#039;)-&gt;select()-&gt;getArray(); // JSON 序列化时，只返回字段 b，而没有 a
+$list = TestModel::query()-&gt;with([&#039;a&#039;])-&gt;withField(&#039;a&#039;, &#039;b&#039;)-&gt;select()-&gt;getArray(); // JSON 序列化时，返回字段中有a、b</code></pre><h3 id="指定查询出的模型可序列化的字段"><a href="#指定查询出的模型可序列化的字段">指定查询出的模型可序列化的字段</a></h3><blockquote>必须使用驼峰命名</blockquote><pre><code class="php">$list1 = TestModel::query()-&gt;withField(&#039;id&#039;, &#039;name&#039;)-&gt;select()-&gt;getArray();
+
+// 上面的代码同下面的效果
+$list2 = TestModel::query()-&gt;select()-&gt;getArray();
+foreach ($list2 as $row)
+{
+    $list2-&gt;__setSerializedFields([&#039;id&#039;, &#039;name&#039;]);
+}</code></pre><h3 id="查询记录"><a href="#查询记录">查询记录</a></h3><p>查询记录并返回一个模型实例。</p><pre><code class="php">// where id = 1
+$testModel = TestModel::find(1);
+// 复合主键 where a = 1 and b = &#039;abc&#039;
+$testModel = TestModel::find(1, &#039;abc&#039;);
+echo $testModel-&gt;getId();
+// 指定多个字段条件 where a = 1 and b = &#039;abc&#039;
+$testModel = TestModel::find([
+    &#039;a&#039; =&gt; 1,
+    &#039;b&#039; =&gt; &#039;abc&#039;,
+]);</code></pre><h3 id="批量查询记录"><a href="#批量查询记录">批量查询记录</a></h3><pre><code class="php">// 查询所有记录
+$list = TestModel::select();
+
+// 带 where 条件的查询，id = 1
+$list = TestModel::select([
+    &#039;id&#039;    =&gt;    1
+]);
+
+// where 回调条件
+$list = TestModel::select(function(IQuery $query){
+    $query-&gt;where(&#039;id&#039;, &#039;=&#039;, 1);
+});
+
+// 查询器查询
+$list = TestModel::query()-&gt;where(&#039;id&#039;, &#039;=&#039;, 1)-&gt;select()-&gt;getArray();
+
+// 以上所有 $list 都是 TestModel[] 类型</code></pre><h3 id="分页查询带扩展字段"><a href="#分页查询带扩展字段">分页查询带扩展字段</a></h3><p><strong>查询总记录数、总页数：</strong></p><pre><code class="php">$page = 1;
+$count = 10;
+$data = TestModel::query()-&gt;paginate($page, $count);
+// 指定转数组后的字段名
+$data = TestModel::query()-&gt;paginate($page, $count, [
+    &#039;field_list&#039; =&gt; &#039;list&#039;,
+    &#039;field_limit&#039; =&gt; &#039;limit&#039;,
+    &#039;field_total&#039; =&gt; &#039;total&#039;,
+    &#039;field_page_count&#039; =&gt; &#039;page_count&#039;,
+]);
+
+$data-&gt;getList(); // 列表数据
+$data-&gt;getTotal(); // 总记录数
+$data-&gt;getLimit(); // $count === 10
+$data-&gt;getPageCount(); // 总页数
+
+var_dump($data-&gt;toArray()); // 转数组
+var_dump(json_encode($data)); // 支持序列化
+// 数据格式如下：
+[
+    &#039;list&#039;          =&gt; [],
+    &#039;total&#039;         =&gt; 100,
+    &#039;limit&#039;         =&gt; 10,
+    &#039;page_count&#039;    =&gt; 10,
+]</code></pre><p><strong>不查询总记录数、总页数：</strong></p><pre><code class="php">$page = 1;
+$count = 10;
+$data = TestModel::query()-&gt;paginate($page, $count, [
+    &#039;total&#039; =&gt;  false,
+]);
+var_dump($data-&gt;toArray()); // 转数组
+var_dump(json_encode($data)); // 支持序列化
+// 数据格式如下：
+[
+    &#039;list&#039;          =&gt; [],
+    &#039;limit&#039;         =&gt; 10,
+]</code></pre><p><strong>全局设置转数组后的字段名：</strong></p><p>配置<code>@app.db.paginate.fields</code>:</p><pre><code class="php">[
+    &#039;list&#039; =&gt; &#039;list&#039;,
+    &#039;limit&#039; =&gt; &#039;limit&#039;,
+    &#039;total&#039; =&gt; &#039;total&#039;,
+    &#039;pageCount&#039; =&gt; &#039;page_count&#039;,
+]</code></pre><h3 id="聚合函数"><a href="#聚合函数">聚合函数</a></h3><pre><code class="php">TestModel::count();
+TestModel::sum(&#039;id&#039;);</code></pre><h3 id="批量更新"><a href="#批量更新">批量更新</a></h3><pre><code class="php">// update tb_test set a = &#039;abc&#039; where id &gt; 5
+TestModel::updateBatch([
+        &#039;a&#039;    =&gt; &#039;abc&#039;,
+    ], [
+        &#039;id&#039; =&gt; [&#039;&gt;&#039;, 5]
+    ]);</code></pre><h3 id="批量删除"><a href="#批量删除">批量删除</a></h3><pre><code class="php">// delete tb_test where a = &#039;abc&#039; and id &gt; 5
+TestModel::deleteBatch([
+    &#039;a&#039; =&gt; [&#039;=&#039;, &#039;abc&#039;],
+    &#039;id&#039; =&gt; [&#039;&gt;&#039;, 5]
+]);</code></pre><h3 id="查询器"><a href="#查询器">查询器</a></h3><pre><code class="php">$testModel = TestModel::query()-&gt;where()-&gt;join()-&gt;select()-&gt;get();
+// $testModel 依然是 TestModel 类型</code></pre><h3 id="对象转数组"><a href="#对象转数组">对象转数组</a></h3><p><strong>将当前对象作为数组返回：</strong></p><p>属性的值，如果是对象，那依然会保持原样。只保证第一层是数组。</p><pre><code class="php">$testModel = TestModel::find(1, &#039;abc&#039;);
+$array = $testModel-&gt;toArray();</code></pre><p><strong>将当前模型转为数组：</strong></p><p>包括属性的值也会被转为数组</p><pre><code class="php">$testModel = TestModel::find(1, &#039;abc&#039;);
+$array = $testModel-&gt;convertToArray(); // 过滤注解定义的隐藏属性
+$array = $testModel-&gt;convertToArray(false); // 不过滤</code></pre><h3 id="转换模型数组为模型"><a href="#转换模型数组为模型">转换模型数组为模型</a></h3><pre><code class="php">$list = TestModel::select();
+$arrayList = TestModel::convertListToArray($list); // 过滤注解定义的隐藏属性
+$arrayList = TestModel::convertListToArray($list, false); // 不过滤</code></pre><h3 id="手动获取/设置模型序列化字段"><a href="#手动获取/设置模型序列化字段">手动获取/设置模型序列化字段</a></h3><p>默认情况下，根据 <code>@Column</code> 注解定义字段，<code>@Serializable</code>、<code>@Serializables</code> 干预序列化（toArray、json_encode）后的字段。</p><p>现在你也可以手动干预了，示例如下：</p><pre><code class="php">$member-&gt;__getSerializedFields(); // 获取，默认为 null 则使用默认规则
+
+$member-&gt;__setSerializedFields([&#039;username&#039;, &#039;password&#039;]); // 手动干预，序列化后只有username、password字段
+$member-&gt;__setSerializedFields(null); // 设为默认</code></pre><h3 id="Fork 模型"><a href="#Fork 模型">Fork 模型</a></h3><p>Fork 模型特性，支持在运行阶段创建一个新的模型类，这个类从原模型继承。</p><p>并且支持指定新模型类使用的：数据库名、数据表名、连接池名。</p><p>方法定义：</p><pre><code class="php">/**
+ * Fork 模型.
+ *
+ * @return class-string&lt;static&gt;
+ */
+public static function fork(?string $tableName = null, ?string $poolName = null)</code></pre><p>例子：</p><pre><code class="php">$newClassName = TestModel::fork(); // 不修改任何参数，返回新的类名（这个用法没有实际意义）
+
+$newClassName = TestModel::fork(&#039;tb_test2&#039;); // 指定表名
+$newClassName = TestModel::fork(&#039;db2.tb_test2&#039;); // 指定数据库名和表名
+
+$newClassName = TestModel::fork(null, &#039;pool2&#039;); // 指定连接池名
+
+$newClassName = TestModel::fork(&#039;tb_test2&#039;, &#039;pool2&#039;); // 同时指定</code></pre>            </div>
+            <div id="mask" style="display:none" onclick="clickMask()"></div>
+        </div>
+    </div>
+
+    <script>
+        $(function(){
+            var leftBarTimeout = null;
+            $('#leftbar').hover(function(e){
+                if(null !== leftBarTimeout)
+                {
+                    clearTimeout(leftBarTimeout);
+                    leftBarTimeout = null;
+                }
+                if(e.type === 'mouseenter')
+                {
+                    $('.left-show-hide').fadeIn(250);
+                }
+                else if($('#leftbar').css('left') == '0px')
+                {
+                    $('.left-show-hide').fadeOut(500);
+                }
+            });
+        });
+        function showLeftbar()
+        {
+            $('#leftbar').css('left', 0);
+            $('#body').css('padding-left','');
+            $('.left-show-hide > i.layui-icon').html('&#xe603;');
+        }
+        function hideLeftbar()
+        {
+            $('#leftbar').css('left', '-240px');
+            $('#body').css('padding-left',0);
+            $('.left-show-hide > i.layui-icon').html('&#xe602;');
+            $('.left-show-hide').fadeIn(250);
+        }
+        $('.left-show-hide').click(function(){
+            if($('#leftbar').css('left') == '0px')
+            {
+                hideLeftbar();
+            }
+            else
+            {
+                showLeftbar();
+            }
+        })
+    </script>
+    <script src="../../statics/js/mddoc-search.js"></script>
+    <div style="display:none"><script src="https://s13.cnzz.com/z_stat.php?id=1273991018&web_id=1273991018" language="JavaScript"></script></div>
+</body>
+</html>
