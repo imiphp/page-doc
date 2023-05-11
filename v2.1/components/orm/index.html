@@ -186,7 +186,7 @@
                     }
                     initTree(catalogList);
                 </script>
-                <h1 id="ORM"><a href="#ORM">ORM</a></h1><p><div id="content-toc-wrap"><p class="content-toc-title">目录</p><div id="content-toc"></div></div></p><h2 id="介绍"><a href="#介绍">介绍</a></h2><p>imi 中目前支持两个模型：数据库模型、内存表模型</p><p>数据库模型与传统 <code>php-fpm</code> 框架下使用并无多大差别，甚至更加好用。</p><p>在 imi 框架中，提供了一个模型生成工具。使用该工具生成的模型，在使用时无需手动定义字段，支持 IDE 代码提示。</p><p>模型生成命令使用说明：<a href="https://doc.imiphp.com/v2.1/dev/generate/model.html">https://doc.imiphp.com/v2.1/dev/generate/model.html</a></p><h2 id="模型字段和序列化"><a href="#模型字段和序列化">模型字段和序列化</a></h2><p>模型实例对象可以同时作为数组和对象使用。</p><p>如数据库中字段为<code>user_age</code>，同时支持原字段名和驼峰命名，使用方法如下：</p><pre><code class="php">// 下面三句是等同的
+                <h1 id="ORM"><a href="#ORM">ORM</a></h1><p><div id="content-toc-wrap"><p class="content-toc-title">目录</p><div id="content-toc"></div></div></p><h2 id="介绍"><a href="#介绍">介绍</a></h2><p>imi 中目前支持两个模型：数据库模型、内存表模型</p><p>数据库模型与传统 <code>php-fpm</code> 框架下使用并无多大差别，甚至更加好用。</p><p>在 imi 框架中，提供了一个模型生成工具。使用该工具生成的模型，在使用时无需手动定义字段，支持 IDE 代码提示。</p><p>模型生成命令使用说明：<a href="/v2.1/dev/generate/model.html">链接</a></p><h2 id="模型字段和序列化"><a href="#模型字段和序列化">模型字段和序列化</a></h2><p>模型实例对象可以同时作为数组和对象使用。</p><p>如数据库中字段为<code>user_age</code>，同时支持原字段名和驼峰命名，使用方法如下：</p><pre><code class="php">// 下面三句是等同的
 $model[&#039;user_age&#039;] = 1;
 $model[&#039;userAge&#039;] = 1;
 $model-&gt;setUserAge(1);</code></pre><p>调用<code>$model-&gt;toArray()</code>可以转为数组。可以直接对模型进行<code>json_encode()</code>处理。</p><p>模型序列化后的字段默认为驼峰格式，如：数据库字段为<code>user_age</code>，序列化后为<code>userAge</code>。</p><p>可以使用注解，设置为使用原数据库字段名：<code>@Entity(camel=false)</code></p>            </div>

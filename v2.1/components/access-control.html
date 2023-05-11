@@ -195,7 +195,7 @@
         // 引入本组件
         &#039;AccessControl&#039;    =&gt;  &#039;Imi\AC&#039;,
     ],
-]</code></pre><p>本组件中包含几个数据表，打开本组件目录，找到<code>Model</code>目录，在数据库中建立对应的表，即可使用。<br>建表这里优先推荐用<code>generate/table</code>：<a href="https://doc.imiphp.com/v2.1/dev/generate/table.html">https://doc.imiphp.com/v2.1/dev/generate/table.html</a></p><h3 id="操作权限"><a href="#操作权限">操作权限</a></h3><h4 id="引入操作权限操作类"><a href="#引入操作权限操作类">引入操作权限操作类</a></h4><pre><code class="php">use Imi\AC\AccessControl\Operation;</code></pre><h4 id="创建操作权限"><a href="#创建操作权限">创建操作权限</a></h4><pre><code class="php">Operation::create(&#039;权限名称&#039;);
+]</code></pre><p>本组件中包含几个数据表，打开本组件目录，找到<code>Model</code>目录，在数据库中建立对应的表，即可使用。<br>建表这里优先推荐用<code>generate/table</code>：<a href="/v2.1/dev/generate/table.html">链接</a></p><h3 id="操作权限"><a href="#操作权限">操作权限</a></h3><h4 id="引入操作权限操作类"><a href="#引入操作权限操作类">引入操作权限操作类</a></h4><pre><code class="php">use Imi\AC\AccessControl\Operation;</code></pre><h4 id="创建操作权限"><a href="#创建操作权限">创建操作权限</a></h4><pre><code class="php">Operation::create(&#039;权限名称&#039;);
 
 // 权限代码不传或为null，则和权限名称相同，不可重复
 Operation::create(&#039;权限名称&#039;, &#039;权限代码&#039;);

@@ -231,7 +231,7 @@ class Index extends HttpController
         // 这个是有问题的，只会在第一次请求时候执行
         $this-&gt;id = $this-&gt;request-&gt;get(&#039;id&#039;);
     }
-}</code></pre><h2 id="属性"><a href="#属性">属性</a></h2><h3 id="$server"><a href="#$server">$server</a></h3><p>详见：<a href="https://doc.imiphp.com/v2.1/core/server.html">https://doc.imiphp.com/v2.1/core/server.html</a></p><h3 id="$request"><a href="#$request">$request</a></h3><p>请求信息对象，可以用于获取参数、请求头等，遵循 PSR-7 标准。</p><h3 id="$response"><a href="#$response">$response</a></h3><p>响应对象，遵循 PSR-7 标准。</p><p>直接对该对象调用 <code>withXXX()</code> 无效，需要如下使用才可。</p><ol><li><p>操作后赋值：</p><pre><code class="php">public function action()
+}</code></pre><h2 id="属性"><a href="#属性">属性</a></h2><h3 id="$server"><a href="#$server">$server</a></h3><p>详见：<a href="/v2.1/core/server.html">链接</a></p><h3 id="$request"><a href="#$request">$request</a></h3><p>请求信息对象，可以用于获取参数、请求头等，遵循 PSR-7 标准。</p><h3 id="$response"><a href="#$response">$response</a></h3><p>响应对象，遵循 PSR-7 标准。</p><p>直接对该对象调用 <code>withXXX()</code> 无效，需要如下使用才可。</p><ol><li><p>操作后赋值：</p><pre><code class="php">public function action()
 {
     $this-&gt;response = $this-&gt;response-&gt;withStatus(404);
 }</code></pre></li><li><p>操作后返回：</p><pre><code class="php">public function action()

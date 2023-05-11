@@ -285,7 +285,7 @@ $name = &#039;imi-etcd-key1&#039;;
 $value = json_encode([&#039;imi&#039; =&gt; &#039;niubi&#039;]);
 $options = [];
 $configCenter-&gt;getDriver(&#039;etcd&#039;)-&gt;push($name, $value);
-$configCenter-&gt;getDriver(&#039;etcd&#039;)-&gt;push($name, $value, $options);</code></pre><h3 id="ZooKeeper"><a href="#ZooKeeper">ZooKeeper</a></h3><ul><li>Swoole 用户请安装 <a href="https://github.com/swoole/ext-zookeeper">swoole-zookeeper</a> 扩展。</li><li>非 Swoole 用户请安装 <a href="3f6eb5c3eb16c9d75ba5975548a548ef9">php-zookeeper</a> 扩展。</li></ul><p><strong>安装：</strong><code>composer require imiphp/imi-zookeeper:~2.1.0</code></p><p><strong>配置：</strong></p><p><code>@app.beans</code>：</p><pre><code class="php">use function Imi\env;
+$configCenter-&gt;getDriver(&#039;etcd&#039;)-&gt;push($name, $value, $options);</code></pre><h3 id="ZooKeeper"><a href="#ZooKeeper">ZooKeeper</a></h3><ul><li>Swoole 用户请安装 <a href="https://github.com/swoole/ext-zookeeper">swoole-zookeeper</a> 扩展。</li><li>非 Swoole 用户请安装 <a href="b8e72bf30312405dff301ce24fc6b5be9">php-zookeeper</a> 扩展。</li></ul><p><strong>安装：</strong><code>composer require imiphp/imi-zookeeper:~2.1.0</code></p><p><strong>配置：</strong></p><p><code>@app.beans</code>：</p><pre><code class="php">use function Imi\env;
 use Imi\Util\Imi;
 
 [

@@ -223,7 +223,7 @@ $list2 = TestModel::query()-&gt;select()-&gt;getArray();
 foreach ($list2 as $row)
 {
     $list2-&gt;__setSerializedFields([&#039;id&#039;, &#039;name&#039;]);
-}</code></pre><blockquote>字段名必须使用驼峰命名</blockquote><h3 id="查询时指定字段"><a href="#查询时指定字段">查询时指定字段</a></h3><p>请使用 <code>@Sql</code> 注解建模，参考文档：<a href="https://doc.imiphp.com/v2.1/components/orm/RDModel/definition.html#@Sql">https://doc.imiphp.com/v2.1/components/orm/RDModel/definition.html#@Sql</a></p><p>不推荐的写法：</p><pre><code class="php">TestModel::query()-&gt;field(&#039;*&#039;)-&gt;fieldRaw(&#039;123 as value&#039;)-&gt;select()-&gt;getArray();</code></pre><blockquote>上述写法会导致默认的 <code>@Serializable</code> 和 <code>@Serializables</code> 注解的序列化配置失效，慎用！</blockquote><h3 id="判断记录是否存在"><a href="#判断记录是否存在">判断记录是否存在</a></h3><pre><code class="php">// where id = 1
+}</code></pre><blockquote>字段名必须使用驼峰命名</blockquote><h3 id="查询时指定字段"><a href="#查询时指定字段">查询时指定字段</a></h3><p>请使用 <code>@Sql</code> 注解建模，参考文档：<a href="/v2.1/components/orm/RDModel/definition.html#@Sql">链接</a></p><p>不推荐的写法：</p><pre><code class="php">TestModel::query()-&gt;field(&#039;*&#039;)-&gt;fieldRaw(&#039;123 as value&#039;)-&gt;select()-&gt;getArray();</code></pre><blockquote>上述写法会导致默认的 <code>@Serializable</code> 和 <code>@Serializables</code> 注解的序列化配置失效，慎用！</blockquote><h3 id="判断记录是否存在"><a href="#判断记录是否存在">判断记录是否存在</a></h3><pre><code class="php">// where id = 1
 $exists = TestModel::exists(1);
 // 复合主键 where a = 1 and b = &#039;abc&#039;
 $exists = TestModel::exists(1, &#039;abc&#039;);

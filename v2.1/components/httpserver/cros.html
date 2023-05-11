@@ -186,7 +186,7 @@
                     }
                     initTree(catalogList);
                 </script>
-                <h1 id="跨域和 OPTIONS 请求"><a href="#跨域和 OPTIONS 请求">跨域和 OPTIONS 请求</a></h1><p><div id="content-toc-wrap"><p class="content-toc-title">目录</p><div id="content-toc"></div></div></p><p>imi 框架内置了一个 <code>OptionsMiddleware</code> 中间件，用于解决使用 <code>application/json</code> 请求时，浏览器会先发送一个 <code>OPTIONS</code> 请求。并且可以解决跨域头问题。</p><p>类名：<code>\Imi\Server\Http\Middleware\OptionsMiddleware</code></p><p>别名：<code>OptionsMiddleware</code></p><p>中间件使用方法：<a href="https://doc.imiphp.com/v2.1/components/httpserver/middleware.html">https://doc.imiphp.com/v2.1/components/httpserver/middleware.html</a></p><h2 id="参数设置"><a href="#参数设置">参数设置</a></h2><p>一般来讲，默认的配置足以满足绝大部分场景。</p><p>如果有特殊需求，你可以在服务器配置中的 <code>beans.OptionsMiddleware</code> 中配置该中间件的参数。</p><p>下面给出的是默认参数值：</p><pre><code class="php">[
+                <h1 id="跨域和 OPTIONS 请求"><a href="#跨域和 OPTIONS 请求">跨域和 OPTIONS 请求</a></h1><p><div id="content-toc-wrap"><p class="content-toc-title">目录</p><div id="content-toc"></div></div></p><p>imi 框架内置了一个 <code>OptionsMiddleware</code> 中间件，用于解决使用 <code>application/json</code> 请求时，浏览器会先发送一个 <code>OPTIONS</code> 请求。并且可以解决跨域头问题。</p><p>类名：<code>\Imi\Server\Http\Middleware\OptionsMiddleware</code></p><p>别名：<code>OptionsMiddleware</code></p><p>中间件使用方法：<a href="/v2.1/components/httpserver/middleware.html">链接</a></p><h2 id="参数设置"><a href="#参数设置">参数设置</a></h2><p>一般来讲，默认的配置足以满足绝大部分场景。</p><p>如果有特殊需求，你可以在服务器配置中的 <code>beans.OptionsMiddleware</code> 中配置该中间件的参数。</p><p>下面给出的是默认参数值：</p><pre><code class="php">[
     &#039;beans&#039; =&gt;  [
         &#039;OptionsMiddleware&#039; =&gt;  [
             // 设置允许的 Origin，为 null 时允许所有，为数组时允许多个
